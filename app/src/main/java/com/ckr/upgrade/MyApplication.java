@@ -51,14 +51,16 @@ public class MyApplication extends DefaultApplicationLike {
     public void onCreate() {
         super.onCreate();
         UpgradeLog.debug(BuildConfig.IS_DEBUG);
-        getApplication().registerActivityLifecycleCallbacks(new AppTracker());
-        initBugly();
+        AppTracker appTracker = new AppTracker();
+        getApplication().registerActivityLifecycleCallbacks(appTracker);
+        initBugly(appTracker);
     }
 
     /**
      * 应用升级和异常上报
+     * @param appTracker
      */
-    private void initBugly() {
+    private void initBugly(AppTracker appTracker) {
         long startTime = System.currentTimeMillis();
         Logd(TAG, "initBugly: startTime:" + startTime);
         Context context = getApplication().getApplicationContext();
@@ -86,13 +88,13 @@ public class MyApplication extends DefaultApplicationLike {
 //        Beta.defaultBannerId=R.mipmap.ic_launcher;//设置更新弹框默认展示的banner
         Beta.storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);//设置sd卡的Download为更新资源存储目录
 //        Beta.showInterruptedStrategy = true;//设置点击过确认的弹窗 在app下次启动自动检查更新时会再次显示。
-        Beta.canShowUpgradeActs.add(MainActivity.class);//添加可显示弹窗的Activity
+//        Beta.canShowUpgradeActs.add(MainActivity.class);//添加可显示弹窗的Activity
         Beta.enableNotification = true;//设置是否显示消息通知
         Beta.autoDownloadOnWifi = false;//设置wifi下自动下载
         Beta.enableHotfix = true;//设置开启热更新
 //      </editor-fold>
 
-        Beta.upgradeListener = new MyUpgradeListener();//app更新策略监听
+        Beta.upgradeListener = new MyUpgradeListener(appTracker);//app更新策略监听
         Bugly.init(context, BUGLY_ID, BuildConfig.IS_DEBUG, strategy);
         Loge(TAG, "initBugly: usedTime:" + (System.currentTimeMillis() - startTime));
     }

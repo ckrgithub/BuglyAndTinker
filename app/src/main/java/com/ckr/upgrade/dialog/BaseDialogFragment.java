@@ -7,22 +7,31 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ckr.upgrade.R;
+import com.tencent.bugly.beta.Beta;
+import com.tencent.bugly.beta.UpgradeInfo;
+import com.tencent.bugly.beta.download.DownloadTask;
+
+import java.math.BigDecimal;
+
+import static com.ckr.upgrade.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/10.
  */
 
 public class BaseDialogFragment extends DialogFragment implements View.OnClickListener {
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_MSG = "msg";
+    private static final String TAG="BaseDialogFragment";
+
     private static final String KEY_POSITIVE = "positive";
     private static final String KEY_NEGATIVE = "negative";
+    private TextView btnOK;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,10 +39,8 @@ public class BaseDialogFragment extends DialogFragment implements View.OnClickLi
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Base_Dialog_Style);
     }
 
-    public void show(@NonNull Activity activity, String title, String msg, String positive, String negative) {
+    public void show(@NonNull Activity activity, String positive, String negative) {
         Bundle bundle = new Bundle();
-        bundle.putString(KEY_TITLE, title);
-        bundle.putString(KEY_MSG, msg);
         bundle.putString(KEY_POSITIVE, positive);
         bundle.putString(KEY_NEGATIVE, negative);
         setArguments(bundle);
@@ -54,24 +61,64 @@ public class BaseDialogFragment extends DialogFragment implements View.OnClickLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView btnCancel = view.findViewById(R.id.btnCancel);
-        TextView btnOK = view.findViewById(R.id.btnOK);
+        btnOK = view.findViewById(R.id.btnOK);
         View container = view.findViewById(R.id.container);
         container.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         btnOK.setOnClickListener(this);
         TextView titleView = view.findViewById(R.id.titleView);
         TextView msgView = view.findViewById(R.id.msgView);
+        TextView versionView = view.findViewById(R.id.versionView);
+        TextView sizeView = view.findViewById(R.id.sizeView);
 
         Bundle bundle = getArguments();
         if (bundle != null) {
             String negative = bundle.getString(KEY_NEGATIVE);
             String positive = bundle.getString(KEY_POSITIVE);
-            String title = bundle.getString(KEY_TITLE);
-            String msg = bundle.getString(KEY_MSG);
-            titleView.setText(title);
-            msgView.setText(msg);
             btnCancel.setText(negative);
             btnOK.setText(positive);
+        }
+
+        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        String title = upgradeInfo.title;
+        String versionName = upgradeInfo.versionName;
+        String newFeature = upgradeInfo.newFeature;
+        int upgradeType = upgradeInfo.upgradeType;
+        double fileSize = upgradeInfo.fileSize / 1000D/1000;
+        Logd(TAG, "onViewCreated: fileSize:"+upgradeInfo.fileSize);
+        BigDecimal decimal = new BigDecimal(fileSize);
+        String size = decimal.setScale(2, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros().toPlainString();
+
+        titleView.setText(title);
+        msgView.setText(newFeature);
+        versionView.setText("版本："+versionName);
+        sizeView.setText("包大小："+size+"M");
+        versionView.setVisibility(View.GONE);
+        sizeView.setVisibility(View.INVISIBLE);
+
+        updateBtn(Beta.getStrategyTask());
+    }
+
+    private void updateBtn(DownloadTask strategyTask) {
+        int status = strategyTask.getStatus();
+        switch (status) {
+            case DownloadTask.INIT:
+            case DownloadTask.DELETED:
+            case DownloadTask.FAILED: {
+                btnOK.setText("升级");
+            }
+            break;
+            case DownloadTask.COMPLETE: {
+                btnOK.setText("立即安装");
+            }
+            break;
+            case DownloadTask.DOWNLOADING: {
+            }
+            break;
+            case DownloadTask.PAUSED: {
+                btnOK.setText("继续下载");
+            }
+            break;
         }
     }
 
@@ -88,8 +135,8 @@ public class BaseDialogFragment extends DialogFragment implements View.OnClickLi
             dismiss();
         } else if (id == R.id.btnCancel) {
             dismiss();
-        }else if (id == R.id.container) {
-            dismiss();
+        } else if (id == R.id.container) {
+//            dismiss();
         }
     }
 }

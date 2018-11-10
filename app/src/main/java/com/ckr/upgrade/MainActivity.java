@@ -1,5 +1,7 @@
 package com.ckr.upgrade;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView versionView;
     private TextView descriptionView;
     private TextView thinkerIdView;
+
+    public static void start(Context context) {
+        Intent starter = new Intent(context, MainActivity.class);
+        context.startActivity(starter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

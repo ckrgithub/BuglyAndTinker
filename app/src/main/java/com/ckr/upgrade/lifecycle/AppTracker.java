@@ -3,7 +3,6 @@ package com.ckr.upgrade.lifecycle;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.ckr.upgrade.MainActivity;
 import com.ckr.upgrade.dialog.BaseDialogFragment;
@@ -16,14 +15,29 @@ import static com.ckr.upgrade.UpgradeLog.Logd;
 
 public class AppTracker implements Application.ActivityLifecycleCallbacks {
     private static final String TAG = "AppTracker";
+    private boolean canShow;
+    private Activity activity;
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         Logd(TAG, "onActivityCreated: " + activity);
         if (activity instanceof MainActivity) {
-//            BaseDialogFragment dialogFragment = new BaseDialogFragment();
-//            dialogFragment.show(activity, "提示", "App升级啦", "确定", "取消");
+            this.activity = activity;
+            showDialog(canShow);
         }
+    }
+
+    public void showDialog(boolean isShow) {
+        canShow = isShow;
+        if (!canShow) {
+            return;
+        }
+        if (activity == null) {
+            return;
+        }
+        canShow = false;
+        BaseDialogFragment dialogFragment = new BaseDialogFragment();
+        dialogFragment.show(activity, "确定", "以后再说");
     }
 
     @Override
