@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.os.Process;
 import android.text.TextUtils;
 
+import com.ckr.upgrade.lifecycle.AppTracker;
 import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
@@ -44,6 +45,7 @@ public class MyApplication extends DefaultApplicationLike {
     public void onCreate() {
         super.onCreate();
         initBugly();
+        getApplication().registerActivityLifecycleCallbacks(new AppTracker());
     }
 
     /**
