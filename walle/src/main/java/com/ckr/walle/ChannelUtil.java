@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class ChannelUtil {
     private static final String TAG = "ChannelUtil";
-    private static final String DEFAULT_CHANNEL = "dinghuo123";
+    private static final String DEFAULT_CHANNEL = "ckr";
 
     /**
      * 获取当前apk的路径
