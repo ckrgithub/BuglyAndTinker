@@ -22,7 +22,7 @@ ext {
             support_v4                        : "com.android.support:support-v4:${supportVersion}",
             constraint_layout                 : "com.android.support.constraint:constraint-layout:${constraintLayout}",
 
-            walle : "com.meituan.android.walle:plugin:${walle}",
+            walle : "com.meituan.android.walle:library:${walle}",
 
             //tinker
             tinker_support : "com.tencent.bugly:tinker-support:${tinkerSupport}",

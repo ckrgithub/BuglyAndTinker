@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply from: 'tinker_support.gradle'
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'ckr'
+            keyPassword '123456'
+            storeFile file('ckr.jks')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion androidConfig.compileSdkVersion
     defaultConfig {
         applicationId appConfig.applicatonId
@@ -16,6 +24,7 @@ android {
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "IS_DEBUG", "false"
@@ -28,16 +37,15 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation applyConfig.appcompat_v7
     implementation applyConfig.support_v4
     implementation applyConfig.constraint_layout
-
-
     implementation applyConfig.tinker_lib
     annotationProcessor(applyConfig.tinker_anno_processor) { changing = true }
     compileOnly(applyConfig.tinker_anno) { changing = true }
-
     implementation applyConfig.bugly_crashreport
     implementation applyConfig.bugly_nativecrashreport
+
+    implementation project(':walle')
 }
