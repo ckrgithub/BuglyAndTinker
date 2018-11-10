@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: 'tinker_support.gradle'
 
 android {
     compileSdkVersion androidConfig.compileSdkVersion
@@ -9,6 +10,9 @@ android {
         versionCode appConfig.versionCode
         versionName appConfig.versionName
 
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "mips", "mips64", "x86", "x86_64"
+        }
     }
     buildTypes {
         release {
