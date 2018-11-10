@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion androidConfig.compileSdkVersion
     defaultConfig {
-        applicationId "com.ckr.upgrade"
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        applicationId appConfig.applicatonId
+        minSdkVersion androidConfig.minSdkVersion
+        targetSdkVersion androidConfig.targetSdkVersion
+        versionCode appConfig.versionCode
+        versionName appConfig.versionName
+
     }
     buildTypes {
         release {
@@ -19,6 +20,15 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation applyConfig.appcompat_v7
+    implementation applyConfig.support_v4
+    implementation applyConfig.constraint_layout
+
+
+    implementation applyConfig.tinker_lib
+    annotationProcessor(applyConfig.tinker_anno_processor) { changing = true }
+    compileOnly(applyConfig.tinker_anno) { changing = true }
+
+    implementation applyConfig.bugly_crashreport
+    implementation applyConfig.bugly_nativecrashreport
 }
