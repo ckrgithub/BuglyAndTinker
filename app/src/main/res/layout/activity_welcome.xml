@@ -10,7 +10,7 @@
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="欢迎页"
+        android:text="这是一款全量更新和热更新的App"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -23,6 +23,7 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 MainActivity.start(WelcomeActivity.this);
+                finish();
             }
         },2000);
     }

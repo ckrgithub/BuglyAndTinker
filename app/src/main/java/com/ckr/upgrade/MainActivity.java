@@ -4,14 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.TextView;
 
+import com.tencent.bugly.beta.Beta;
+import com.tencent.bugly.beta.UpgradeInfo;
+import com.tencent.bugly.beta.tinker.TinkerManager;
+
+import static com.ckr.upgrade.UpgradeLog.Logd;
+
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     private TextView versionView;
-    private TextView descriptionView;
-    private TextView thinkerIdView;
+    private TextView tinkerIdView;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MainActivity.class);
@@ -22,8 +28,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        descriptionView = findViewById(R.id.description);
         versionView = findViewById(R.id.version);
-        thinkerIdView = findViewById(R.id.thinkerId);
+        tinkerIdView = findViewById(R.id.tinkerId);
+
+        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        String versionName = upgradeInfo.versionName;
+        String tinkerId = TinkerManager.getTinkerId();
+        Logd(TAG, "onCreate: versionName:" + versionName+",tinkerId:"+tinkerId);
+        versionView.append(versionName);
+        tinkerIdView.append(tinkerId);
     }
 }
