@@ -35,6 +35,11 @@ android {
             buildConfigField "boolean", "IS_DEBUG", "true"
         }
     }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = 'Upgrade' + '-' + variant.buildType.name + '-v' + defaultConfig.versionName + '.' + defaultConfig.versionCode + '.apk'
+        }
+    }
 }
 
 dependencies {
