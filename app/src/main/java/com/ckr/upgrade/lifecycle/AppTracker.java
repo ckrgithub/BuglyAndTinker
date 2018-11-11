@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.ckr.upgrade.MainActivity;
 import com.ckr.upgrade.dialog.UpgradeDialogFragment;
 
-import static com.ckr.upgrade.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/10.

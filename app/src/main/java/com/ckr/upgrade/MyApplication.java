@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.ckr.upgrade.lifecycle.AppTracker;
 import com.ckr.upgrade.listener.MyUpgradeListener;
+import com.ckr.upgrade.util.UpgradeLog;
 import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
@@ -21,8 +22,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static com.ckr.upgrade.UpgradeLog.Logd;
-import static com.ckr.upgrade.UpgradeLog.Loge;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 /**
  * Created by ckr on 2018/11/10.

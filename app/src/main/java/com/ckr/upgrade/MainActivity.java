@@ -10,7 +10,7 @@ import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.tinker.TinkerManager;
 
-import static com.ckr.upgrade.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = "MainActivity";

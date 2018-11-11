@@ -21,8 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.ckr.upgrade.UpgradeLog.Logd;
-import static com.ckr.upgrade.UpgradeLog.Loge;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Loge;
 import static com.tencent.bugly.beta.tinker.TinkerManager.getApplication;
 
 /**

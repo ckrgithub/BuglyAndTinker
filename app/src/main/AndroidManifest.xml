@@ -32,7 +32,7 @@
 
         <!-- android 7.0或以上设备访问共享文件的适配 -->
         <provider
-            android:name=".MyFileProvider"
+            android:name=".provider.MyFileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true"

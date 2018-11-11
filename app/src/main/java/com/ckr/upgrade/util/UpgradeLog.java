@@ -1,4 +1,4 @@
-package com.ckr.upgrade;
+package com.ckr.upgrade.util;
 
 import android.util.Log;
 

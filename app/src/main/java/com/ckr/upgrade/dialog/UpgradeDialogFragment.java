@@ -18,7 +18,7 @@ import com.tencent.bugly.beta.download.DownloadTask;
 
 import java.math.BigDecimal;
 
-import static com.ckr.upgrade.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/11.
