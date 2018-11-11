@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ckr.upgrade.R;
+import com.ckr.upgrade.listener.MyDownloadListener;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.download.DownloadTask;
@@ -23,7 +24,7 @@ import static com.ckr.upgrade.UpgradeLog.Logd;
  * Created by ckr on 2018/11/11.
  */
 
-public class UpgradeDialogFragment extends BaseDialogFragment {
+public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownloadListener.ApkDownloadListener {
 	private static final String TAG = "BaseDialogFragment";
 
 	private static final String KEY_POSITIVE = "positive";
@@ -38,6 +39,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 
 	private TextView btnOK;
 	private String positive = "立即更新";
+	private MyDownloadListener downloadListener;
 
 	public void show(@NonNull Activity activity) {
 		if (activity instanceof FragmentActivity) {
@@ -50,6 +52,13 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 	@Override
 	protected int getLayoutId() {
 		return R.layout.dialog_upgrade;
+	}
+
+	@Override
+	protected void init(Bundle savedInstanceState) {
+		downloadListener = new MyDownloadListener();
+		downloadListener.registerApkDownloadListener(this);
+		Beta.registerDownloadListener(downloadListener);
 	}
 
 	@Override
@@ -137,13 +146,36 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 				updateBtn(downloadTask);
 				if (Beta.getUpgradeInfo().upgradeType != STRATEGY_FORCE && downloadTask.getStatus() == DownloadTask.DOWNLOADING) {
 					Toast.makeText(getContext(), "开始下载", Toast.LENGTH_SHORT).show();
-					dismiss();
+//					dismiss();
 				}
 				break;
 			case R.id.btnCancel:
 				dismiss();
 				break;
 		}
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		if (downloadListener != null) {
+			downloadListener.unregisterApkDownloadListener();
+		}
+	}
+
+	@Override
+	public void onReceive(DownloadTask downloadTask) {
+		btnOK.setText(downloadTask.getSavedLength() * 100 / downloadTask.getTotalLength() + "%");
+	}
+
+	@Override
+	public void onCompleted(DownloadTask downloadTask) {
+		btnOK.setText("立即安装");
+	}
+
+	@Override
+	public void onFailed(DownloadTask downloadTask, int i, String s) {
+		btnOK.setText("下载失败");
 	}
 
 

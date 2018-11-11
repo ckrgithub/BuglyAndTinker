@@ -1,12 +1,10 @@
-package com.ckr.upgrade;
+package com.ckr.upgrade.listener;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.ckr.upgrade.lifecycle.AppTracker;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
-
 
 import static com.ckr.upgrade.UpgradeLog.Logd;
 import static com.ckr.upgrade.UpgradeLog.Loge;

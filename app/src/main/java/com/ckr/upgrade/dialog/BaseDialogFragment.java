@@ -45,6 +45,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements View.
 		FrameLayout root = (FrameLayout) inflate.findViewById(R.id.dialog_container);
 		root.setOnClickListener(this);
 		View.inflate(getContext(), getLayoutId(), root);
+		init(savedInstanceState);
 		return inflate;
 	}
 
@@ -59,6 +60,8 @@ public abstract class BaseDialogFragment extends DialogFragment implements View.
 	}
 
 	protected abstract int getLayoutId();
+
+	protected abstract void init(Bundle savedInstanceState);
 
 	/**
 	 * @param cancelableType DEFAULT: 即可以点击dialog外部区域隐藏dialog，也可以点击返回键隐藏dialog
