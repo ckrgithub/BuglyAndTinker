@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 	private static final int STRATEGY_MANUAL = 3;
 
 	private TextView btnOK;
+	private String positive = "立即更新";
 
 	public void show(@NonNull Activity activity) {
 		if (activity instanceof FragmentActivity) {
@@ -55,31 +57,19 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 		super.onViewCreated(view, savedInstanceState);
 		TextView btnCancel = view.findViewById(R.id.btnCancel);
 		btnOK = view.findViewById(R.id.btnOK);
-		btnOK.setOnClickListener(this);
-		btnCancel.setOnClickListener(this);
+		View verticalLine = view.findViewById(R.id.verticalLine);
 		TextView titleView = view.findViewById(R.id.titleView);
 		TextView msgView = view.findViewById(R.id.msgView);
 		TextView versionView = view.findViewById(R.id.versionView);
 		TextView sizeView = view.findViewById(R.id.sizeView);
-
-		Bundle bundle = getArguments();
-		if (bundle != null) {
-			String negative = bundle.getString(KEY_NEGATIVE);
-			String positive = bundle.getString(KEY_POSITIVE);
-			int cancelableType = bundle.getInt(TYPE_CANCELABLE, DEFAULT);
-			setCancelableType(cancelableType);
-			btnCancel.setText(negative);
-			btnOK.setText(positive);
-		}
+		btnOK.setOnClickListener(this);
+		btnCancel.setOnClickListener(this);
 
 		UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
 		String title = upgradeInfo.title;
 		String versionName = upgradeInfo.versionName;
 		String newFeature = upgradeInfo.newFeature;
 		int upgradeType = upgradeInfo.upgradeType;
-		if (upgradeType == STRATEGY_FORCE) {
-			setCancelableType(NO_CANCELED);
-		}
 		double fileSize = upgradeInfo.fileSize / 1000D / 1000;
 		Logd(TAG, "onViewCreated: fileSize:" + upgradeInfo.fileSize);
 		BigDecimal decimal = new BigDecimal(fileSize);
@@ -92,6 +82,26 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 		versionView.setVisibility(View.GONE);
 		sizeView.setVisibility(View.INVISIBLE);
 
+		Bundle bundle = getArguments();
+		if (bundle != null) {
+			String negative = bundle.getString(KEY_NEGATIVE);
+			positive = bundle.getString(KEY_POSITIVE);
+			int cancelableType = bundle.getInt(TYPE_CANCELABLE, DEFAULT);
+			if (upgradeType == STRATEGY_FORCE) {
+				Logd(TAG, "onViewCreated: ");
+				setCancelableType(NO_CANCELED);
+				btnCancel.setVisibility(View.GONE);
+				verticalLine.setVisibility(View.GONE);
+				ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) btnOK.getLayoutParams();
+				layoutParams.leftToLeft = R.id.constraintLayout;
+				btnOK.setLayoutParams(layoutParams);
+				btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
+			} else {
+				setCancelableType(cancelableType);
+				btnCancel.setText(negative);
+			}
+		}
+
 		updateBtn(Beta.getStrategyTask());
 	}
 
@@ -101,7 +111,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 			case DownloadTask.INIT:
 			case DownloadTask.DELETED:
 			case DownloadTask.FAILED: {
-				btnOK.setText("升级");
+				btnOK.setText(positive);
 			}
 			break;
 			case DownloadTask.COMPLETE: {
