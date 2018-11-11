@@ -77,6 +77,9 @@ public class UpgradeDialogFragment extends BaseDialogFragment {
 		String versionName = upgradeInfo.versionName;
 		String newFeature = upgradeInfo.newFeature;
 		int upgradeType = upgradeInfo.upgradeType;
+		if (upgradeType == STRATEGY_FORCE) {
+			setCancelableType(NO_CANCELED);
+		}
 		double fileSize = upgradeInfo.fileSize / 1000D / 1000;
 		Logd(TAG, "onViewCreated: fileSize:" + upgradeInfo.fileSize);
 		BigDecimal decimal = new BigDecimal(fileSize);
