@@ -15,6 +15,7 @@ public class WelcomeActivity extends BaseActivity {
     public static final int TYPE_BUGLY = 0;
     public static final int TYPE_OFFICIAL = 1;
     private int upgradeType = TYPE_BUGLY;
+    private static final boolean noRequestPermission = true;
 
 
     @Override
@@ -25,11 +26,13 @@ public class WelcomeActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(WelcomeActivity.this, "客官，莫急", Toast.LENGTH_SHORT).show();
-//                MainActivity.start(WelcomeActivity.this);
             }
         });
-        onPermissionGranted(0);
-//        PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (noRequestPermission) {
+            onPermissionGranted(-1);
+        } else {
+            PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 
 
@@ -37,7 +40,7 @@ public class WelcomeActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PermissionManager.REQUEST_CODE_STORAGE) {
-//            PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
 

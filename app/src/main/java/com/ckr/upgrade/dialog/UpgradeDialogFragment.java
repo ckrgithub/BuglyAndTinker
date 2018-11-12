@@ -1,7 +1,6 @@
 package com.ckr.upgrade.dialog;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.R;
@@ -18,7 +16,6 @@ import com.ckr.upgrade.listener.MyDownloadListener;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.download.DownloadTask;
-import com.tencent.bugly.beta.upgrade.UpgradeListener;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -29,7 +26,7 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
  * Created by ckr on 2018/11/11.
  */
 
-public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownloadListener.ApkDownloadListener {
+public class UpgradeDialogFragment extends BaseDialogFragment{
     private static final String TAG = "BaseDialogFragment";
 
     private static final String KEY_POSITIVE = "positive";
@@ -44,7 +41,6 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
 
     private TextView btnOK;
     private String positive = "立即更新";
-    private MyDownloadListener downloadListener;
     private static OnDialogClickListener onDialogClickListener;
 
     public static UpgradeDialogFragment newInstance(String positive, String negative, @CancelableType int cancelableType, OnDialogClickListener onDialogClickListener) {
@@ -61,8 +57,6 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
     public void show(@NonNull Activity activity) {
         if (activity instanceof FragmentActivity) {
             show(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
-        } else {
-            show(getFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
         }
     }
 
@@ -73,9 +67,6 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        downloadListener = new MyDownloadListener();
-        downloadListener.registerApkDownloadListener(this);
-        Beta.registerDownloadListener(downloadListener);
     }
 
     @Override
@@ -127,31 +118,20 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
                 btnCancel.setText(negative);
             }
         }
-
-        updateBtn(Beta.getStrategyTask());
-    }
-
-    private void updateBtn(DownloadTask strategyTask) {
-        int status = strategyTask.getStatus();
-        switch (status) {
-            case DownloadTask.INIT:
-            case DownloadTask.DELETED:
-            case DownloadTask.FAILED: {
-                btnOK.setText(positive);
-            }
-            break;
-            case DownloadTask.COMPLETE: {
-                btnOK.setText("立即安装");
-            }
-            break;
-            case DownloadTask.DOWNLOADING: {
-            }
-            break;
-            case DownloadTask.PAUSED: {
-                btnOK.setText("继续下载");
-            }
-            break;
+        int apkDownloadStatus = getApkDownloadStatus();
+        switch (apkDownloadStatus){
+            case DownLoadService.INIT:
+                break;
+            case DownLoadService.COMPLETE:
+                positive="立即安装";
+                break;
+            case DownLoadService.PAUSED:
+                positive="继续下载";
+                break;
+            case DownLoadService.FAILED:
+                break;
         }
+        btnOK.setText(positive);
     }
 
     @Override
@@ -161,28 +141,9 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
             case R.id.btnOK:
 //                dismiss();
                 if (onDialogClickListener != null) {
-                    UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
-                    if (upgradeInfo != null) {
-                        String apkUrl = upgradeInfo.apkUrl;
-                        long fileSize = upgradeInfo.fileSize;
-                        String apkPath = DownLoadService.getApkPath(apkUrl);
-                        if (!TextUtils.isEmpty(apkPath)) {
-                            File file = new File(apkPath);
-                            Logd(TAG, "onClick: len:" + file.length() + ",fileSize:" + fileSize);
-                            if (file.length() >= fileSize) {
-                                Toast.makeText(UpgradeDialogFragment.this.getContext(), "安装", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        }
-                    }
+                    if (getApkDownloadStatus() == DownLoadService.COMPLETE) return;
                     onDialogClickListener.onPositiveClick();
                 }
-//				DownloadTask downloadTask = Beta.startDownload();
-//				updateBtn(downloadTask);
-//				if (Beta.getUpgradeInfo().upgradeType != STRATEGY_FORCE && downloadTask.getStatus() == DownloadTask.DOWNLOADING) {
-//					Toast.makeText(getContext(), "开始下载", Toast.LENGTH_SHORT).show();
-////					dismiss();
-//				}
                 break;
             case R.id.btnCancel:
                 dismiss();
@@ -190,29 +151,36 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
         }
     }
 
+    /**
+     * apk是否已经下载
+     *
+     * @return
+     */
+    private int getApkDownloadStatus() {
+        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        if (upgradeInfo != null) {
+            String apkUrl = upgradeInfo.apkUrl;
+            long fileSize = upgradeInfo.fileSize;
+            String apkPath = DownLoadService.getApkPath(apkUrl);
+            if (!TextUtils.isEmpty(apkPath)) {
+                File file = new File(apkPath);
+                Logd(TAG, "getApkDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);
+                if (file.exists()) {
+                    if (file.length() == fileSize) {
+                        return DownLoadService.COMPLETE;
+                    } else {
+                        return DownLoadService.DELETED;
+                    }
+                }
+            }
+        }
+        return DownLoadService.INIT;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (downloadListener != null) {
-            downloadListener.unregisterApkDownloadListener();
-        }
     }
-
-    @Override
-    public void onReceive(DownloadTask downloadTask) {
-        btnOK.setText(downloadTask.getSavedLength() * 100 / downloadTask.getTotalLength() + "%");
-    }
-
-    @Override
-    public void onCompleted(DownloadTask downloadTask) {
-        btnOK.setText("立即安装");
-    }
-
-    @Override
-    public void onFailed(DownloadTask downloadTask, int i, String s) {
-        btnOK.setText("下载失败");
-    }
-
 
     public static class Builder {
         private String negative;

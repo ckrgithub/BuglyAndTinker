@@ -58,7 +58,6 @@ public class DownLoadService extends Service {
     public final static int FAILED = 5;
 
     private final static int NOTIFY_ID = 1111;
-    private final static int VERSION = 4;
     private DownLoadBinder binder;
     private long downloadLen = 0;
     private long contentLen = 0;
@@ -67,9 +66,7 @@ public class DownLoadService extends Service {
     private MyHandler myHandler;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
-    private Notification notification;
     private Call call;
-    private Intent intent;
 
     @Override
     public void onCreate() {
@@ -258,7 +255,7 @@ public class DownLoadService extends Service {
                 .setOngoing(true)
                 .setSmallIcon(R.mipmap.ic_launcher);
 
-        notification = builder.build();
+        Notification notification = builder.build();
         notification.defaults |= Notification.DEFAULT_LIGHTS;
         notification.defaults |= Notification.DEFAULT_VIBRATE;
         notification.defaults |= Notification.DEFAULT_SOUND;
@@ -268,7 +265,7 @@ public class DownLoadService extends Service {
     }
 
     private PendingIntent getPendingIntent(int downloadStatus) {
-        this.intent = new Intent();
+        Intent intent = new Intent();
         intent.setAction(DOWNLOAD_RECEIVER);
         intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
@@ -332,8 +329,8 @@ public class DownLoadService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case DOWNLOADING:
-                    getPendingIntent(DOWNLOADING);
-                    intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
+                    int mStatus = mDownloadStatus;
+                    mDownloadStatus = DOWNLOADING;
                     Object obj = msg.obj;
                     if (obj instanceof Long) {
                         Long downloadLen = (Long) obj;
@@ -341,14 +338,12 @@ public class DownLoadService extends Service {
                         if (progress < 100) {
                             builder.setProgress(100, progress, false);
                             builder.setContentInfo(progress + "%");
-                            if (mDownloadStatus != DOWNLOADING) {
+                            if (mStatus != DOWNLOADING) {
                                 builder.setContentIntent(getPendingIntent(DOWNLOADING));
                             }
-                            notification = builder.build();
-                        } else {
+                            Notification notification = builder.build();
+                            notificationManager.notify(NOTIFY_ID, notification);
                         }
-                        notificationManager.notify(NOTIFY_ID, notification);
-                        mDownloadStatus = DOWNLOADING;
                         if (mDownloadListener != null) {
                             mDownloadListener.onReceive(contentLen, downloadLen, progress);
                         }
@@ -356,7 +351,6 @@ public class DownLoadService extends Service {
                     break;
                 case FAILED:
                     mDownloadStatus = FAILED;
-                    intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
                     obj = msg.obj;
                     if (obj instanceof IOException) {
                         if (mDownloadListener != null) {
@@ -365,13 +359,12 @@ public class DownLoadService extends Service {
                     }
                     break;
                 case COMPLETE:
-                    notification = builder.build();
+                    mDownloadStatus = COMPLETE;
+                    Notification notification = builder.build();
                     builder.setContentIntent(getPendingIntent(COMPLETE));
 //                            notification.flags = Notification.FLAG_AUTO_CANCEL;
 //                                stopSelf();
                     notificationManager.notify(NOTIFY_ID, notification);
-                    mDownloadStatus = COMPLETE;
-                    intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
 //                    if (notificationManager != null) {
 //                        notificationManager.cancel(NOTIFY_ID);
 //                    }
