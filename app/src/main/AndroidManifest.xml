@@ -17,8 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
-        </activity>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"></activity>
 
         <activity
             android:name=".WelcomeActivity"
@@ -29,6 +28,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--apk下载服务-->
+        <service
+            android:name=".DownLoadService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".DownloadReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="apk_download_receiver"/>
+            </intent-filter>
+        </receiver>
 
         <!-- android 7.0或以上设备访问共享文件的适配 -->
         <provider
