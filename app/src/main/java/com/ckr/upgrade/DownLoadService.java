@@ -33,6 +33,7 @@ import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.ckr.upgrade.DownloadReceiver.DOWNLOAD_RECEIVER;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
@@ -42,7 +43,6 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
  */
 public class DownLoadService extends Service {
     private static final String TAG = "DownLoadService";
-    private static final String DOWNLOAD_RECEIVER = "apk_download_receiver";
     public static final String DOWNLOAD_PROGRESS = "download_progress";
     public static final String APK_URL = "apk_url";
     private static final String CHANNEL_ID = "ckr";
@@ -63,17 +63,18 @@ public class DownLoadService extends Service {
     private MyHandler myHandler;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
-    private Call call;
+    private static Call call;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "onCreate: " + this);
         myHandler = new MyHandler();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Logd(TAG, "onStartCommand: flags:" + flags + ",startId:" + startId);
+        Logd(TAG, "onStartCommand: flags:" + flags + ",startId:" + startId + ",this:" + this);
         mDownloadStatus = INIT;
         sendNotification();
         downloadApk();
@@ -123,12 +124,23 @@ public class DownLoadService extends Service {
                 long startLen = apkFile.length();
                 contentLen = upgradeInfo.fileSize;
                 downloadLen = (int) startLen;
+                if (contentLen == downloadLen) {
+                    if (mDownloadListener != null) {
+                        mDownloadListener.onCompleted(path);
+                    }
+                    return;
+                }
                 Logd(TAG, "onStartCommand: downloadLen:" + downloadLen + ",contentLen:" + contentLen + ",exist:" + apkFile.exists());
                 final Request request = new Request.Builder()
                         .addHeader("RANGE", "bytes=" + startLen + "-" + contentLen)
                         .url(apkUrl)
                         .build();
                 call = OkHttpFactory.createOkHttp().newCall(request);
+//                try {
+//                    Response execute = call.execute();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -190,7 +202,7 @@ public class DownLoadService extends Service {
         }
     }
 
-    public void cancel(String url) {
+    public static void cancel(String url) {
         if (call != null) {
             if (!call.isCanceled()) {
                 call.cancel();

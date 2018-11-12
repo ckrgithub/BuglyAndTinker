@@ -1,6 +1,7 @@
 package com.ckr.upgrade.dialog;
 
 import android.app.Activity;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,8 +10,10 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ckr.upgrade.DownLoadService;
+import com.ckr.upgrade.DownloadReceiver;
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.listener.MyDownloadListener;
 import com.ckr.upgrade.util.ApkUtil;
@@ -19,6 +22,7 @@ import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.download.DownloadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
@@ -27,7 +31,7 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
  * Created by ckr on 2018/11/11.
  */
 
-public class UpgradeDialogFragment extends BaseDialogFragment{
+public class UpgradeDialogFragment extends BaseDialogFragment implements DownLoadService.DownloadListener{
     private static final String TAG = "BaseDialogFragment";
 
     private static final String KEY_POSITIVE = "positive";
@@ -120,14 +124,14 @@ public class UpgradeDialogFragment extends BaseDialogFragment{
             }
         }
         int apkDownloadStatus = getApkDownloadStatus();
-        switch (apkDownloadStatus){
+        switch (apkDownloadStatus) {
             case DownLoadService.INIT:
                 break;
             case DownLoadService.COMPLETE:
-                positive="立即安装";
+                positive = "立即安装";
                 break;
             case DownLoadService.PAUSED:
-                positive="继续下载";
+                positive = "继续下载";
                 break;
             case DownLoadService.FAILED:
                 break;
@@ -141,15 +145,48 @@ public class UpgradeDialogFragment extends BaseDialogFragment{
         switch (v.getId()) {
             case R.id.btnOK:
 //                dismiss();
+                if (Beta.getUpgradeInfo().upgradeType == STRATEGY_FORCE) {
+                } else {
+                    dismiss();
+                }
                 if (onDialogClickListener != null) {
-                    if (getApkDownloadStatus() == DownLoadService.COMPLETE) return;
-                    onDialogClickListener.onPositiveClick();
+                    if (getApkDownloadStatus() == DownLoadService.COMPLETE) {
+                        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+                        if (upgradeInfo != null) {
+                            String apkUrl = upgradeInfo.apkUrl;
+                            ApkUtil.installApk(apkUrl);
+                        }
+                    } else {
+                        onDialogClickListener.onPositiveClick();
+                    }
+
                 }
                 break;
             case R.id.btnCancel:
                 dismiss();
                 break;
         }
+    }
+
+    private DownloadReceiver downloadReceiver;
+
+    private void register() {
+        downloadReceiver = new DownloadReceiver(this);
+        IntentFilter filter = new IntentFilter(DownloadReceiver.DOWNLOAD_RECEIVER);
+        getContext().registerReceiver(downloadReceiver, filter);
+    }
+
+    private void unregister() {
+        if (downloadReceiver != null) {
+            getContext().unregisterReceiver(downloadReceiver);
+            downloadReceiver = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregister();
     }
 
     /**
@@ -181,6 +218,21 @@ public class UpgradeDialogFragment extends BaseDialogFragment{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void onReceive(long contentLen, long downloadLen, int progress) {
+
+    }
+
+    @Override
+    public void onCompleted(String path) {
+
+    }
+
+    @Override
+    public void onFailed(IOException e) {
+
     }
 
     public static class Builder {

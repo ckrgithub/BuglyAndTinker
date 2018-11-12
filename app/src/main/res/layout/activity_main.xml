@@ -38,6 +38,7 @@
         app:layout_constraintLeft_toLeftOf="@+id/center"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/checkUpgrade"
         android:layout_width="wrap_content"
@@ -46,5 +47,23 @@
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/version" />
+
+    <Button
+        android:id="@+id/btnService"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动下载服务"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkUpgrade" />
+
+    <Button
+        android:id="@+id/btnReceiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="注册广播"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/btnService"
+        app:layout_constraintTop_toTopOf="@+id/btnService" />
 
 </android.support.constraint.ConstraintLayout>
