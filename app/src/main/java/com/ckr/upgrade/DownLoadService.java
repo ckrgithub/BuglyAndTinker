@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -125,7 +124,7 @@ public class DownLoadService extends Service {
             String apkName = getApkName(apkUrl);
             Logd(TAG, "onStartCommand: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
-                File publicDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File publicDirectory = MyApplication.getInstance().getApplication().getExternalFilesDir(null);
                 String absolutePath = publicDirectory.getAbsolutePath();
                 final String path = absolutePath + File.separator + apkName;
                 final File apkFile = new File(path);
@@ -160,7 +159,7 @@ public class DownLoadService extends Service {
                             outputStream = new FileOutputStream(apkFile, true);
                             byte[] buffer = new byte[1024];
                             int len = 0;
-                            while ((len = inputStream.read(buffer)) != 0) {
+                            while ((len = inputStream.read(buffer)) > 0) {
                                 outputStream.write(buffer, 0, len);
                                 downloadLen += len;
                                 if (myHandler != null) {
@@ -220,7 +219,7 @@ public class DownLoadService extends Service {
         if (TextUtils.isEmpty(apkName)) {
             return null;
         }
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + apkName;
+        return MyApplication.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + File.separator + apkName;
     }
 
     public void cancel(String url) {
@@ -235,15 +234,6 @@ public class DownLoadService extends Service {
      * 通知
      */
     private void sendNotification() {
-        this.intent = new Intent();
-        intent.setAction(DOWNLOAD_RECEIVER);
-        intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
-        if (upgradeInfo != null) {
-            String apkUrl = upgradeInfo.apkUrl;
-            intent.putExtra(APK_URL, apkUrl);
-        }
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         // 8.0适配
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -264,7 +254,7 @@ public class DownLoadService extends Service {
                 .setContentText("下载中")
                 .setContentInfo("0%")
                 .setWhen(System.currentTimeMillis())
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getPendingIntent(INIT))
                 .setOngoing(true)
                 .setSmallIcon(R.mipmap.ic_launcher);
 
@@ -275,6 +265,19 @@ public class DownLoadService extends Service {
         notification.flags = Notification.FLAG_ONGOING_EVENT;
 
         notificationManager.notify(NOTIFY_ID, notification);
+    }
+
+    private PendingIntent getPendingIntent(int downloadStatus) {
+        this.intent = new Intent();
+        intent.setAction(DOWNLOAD_RECEIVER);
+        intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
+        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        if (upgradeInfo != null) {
+            String apkUrl = upgradeInfo.apkUrl;
+            intent.putExtra(APK_URL, apkUrl);
+        }
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return pendingIntent;
     }
 
     /**
@@ -329,7 +332,7 @@ public class DownLoadService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case DOWNLOADING:
-                    mDownloadStatus = DOWNLOADING;
+                    getPendingIntent(DOWNLOADING);
                     intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
                     Object obj = msg.obj;
                     if (obj instanceof Long) {
@@ -338,13 +341,14 @@ public class DownLoadService extends Service {
                         if (progress < 100) {
                             builder.setProgress(100, progress, false);
                             builder.setContentInfo(progress + "%");
+                            if (mDownloadStatus != DOWNLOADING) {
+                                builder.setContentIntent(getPendingIntent(DOWNLOADING));
+                            }
                             notification = builder.build();
                         } else {
-                            notification = builder.build();
-                            notification.flags = Notification.FLAG_AUTO_CANCEL;
-//                                stopSelf();
                         }
                         notificationManager.notify(NOTIFY_ID, notification);
+                        mDownloadStatus = DOWNLOADING;
                         if (mDownloadListener != null) {
                             mDownloadListener.onReceive(contentLen, downloadLen, progress);
                         }
@@ -361,13 +365,18 @@ public class DownLoadService extends Service {
                     }
                     break;
                 case COMPLETE:
+                    notification = builder.build();
+                    builder.setContentIntent(getPendingIntent(COMPLETE));
+//                            notification.flags = Notification.FLAG_AUTO_CANCEL;
+//                                stopSelf();
+                    notificationManager.notify(NOTIFY_ID, notification);
                     mDownloadStatus = COMPLETE;
                     intent.putExtra(DOWNLOAD_PROGRESS, mDownloadStatus);
-                    if (notificationManager != null) {
-                        notificationManager.cancel(NOTIFY_ID);
-                    }
+//                    if (notificationManager != null) {
+//                        notificationManager.cancel(NOTIFY_ID);
+//                    }
                     obj = msg.obj;
-                    if (obj == null) {
+                    if (obj != null) {
                         if (mDownloadListener != null) {
                             mDownloadListener.onCompleted(obj.toString());
                         }

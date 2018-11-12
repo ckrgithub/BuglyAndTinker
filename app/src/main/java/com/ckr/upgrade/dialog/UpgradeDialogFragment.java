@@ -159,6 +159,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
         super.onClick(v);
         switch (v.getId()) {
             case R.id.btnOK:
+//                dismiss();
                 if (onDialogClickListener != null) {
                     UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
                     if (upgradeInfo != null) {
@@ -167,8 +168,9 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements MyDownl
                         String apkPath = DownLoadService.getApkPath(apkUrl);
                         if (!TextUtils.isEmpty(apkPath)) {
                             File file = new File(apkPath);
-                            Logd(TAG, "onClick: fileSize:" + file.length());
+                            Logd(TAG, "onClick: len:" + file.length() + ",fileSize:" + fileSize);
                             if (file.length() >= fileSize) {
+                                Toast.makeText(UpgradeDialogFragment.this.getContext(), "安装", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }

@@ -28,7 +28,8 @@ public class WelcomeActivity extends BaseActivity {
 //                MainActivity.start(WelcomeActivity.this);
             }
         });
-        PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        onPermissionGranted(0);
+//        PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
 
@@ -36,7 +37,7 @@ public class WelcomeActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PermissionManager.REQUEST_CODE_STORAGE) {
-            PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//            PermissionManager.requestPermission(this, PermissionManager.REQUEST_CODE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
 
