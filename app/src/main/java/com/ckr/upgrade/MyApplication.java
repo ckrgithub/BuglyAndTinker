@@ -90,7 +90,9 @@ public class MyApplication extends DefaultApplicationLike {
 		//<editor-fold desc="应用升级-->Beta类作为Bugly的初始化扩展，通过Beta类可以修改升级的检测时机，界面元素以及自定义升级行为">
 		Beta.autoInit = true;//是否自动初始化升级模块
 //        Beta.init(context,BuildConfig.IS_DEBUG);//手动初始化升级模块
-//        Beta.upgradeCheckPeriod = 60 * 1000;//设置升级检查周期为60s,60s内sdk不重复向后台请求策略
+		Beta.autoCheckUpgrade=false;//是否自动检查更新
+//		Beta.checkUpgrade(false,false);//检查升级功能
+        Beta.upgradeCheckPeriod = 60 * 1000;//设置升级检查周期为60s,60s内sdk不重复向后台请求策略
 		Beta.initDelay = 3 * 1000;//设置启动延时为3s，app启动1s后初始化sdk,避免影响app启动速度
 		Beta.largeIconId = R.mipmap.ic_launcher;//设置通知栏大图标
 		Beta.smallIconId = R.mipmap.ic_launcher;//设置通知栏小图标
@@ -104,6 +106,7 @@ public class MyApplication extends DefaultApplicationLike {
 //      </editor-fold>
 
 		Beta.upgradeListener = new MyUpgradeListener(appTracker);//app更新策略监听
+		//初始化统一接口
 		Bugly.init(context, BUGLY_ID, BuildConfig.IS_DEBUG, strategy);
 		Loge(TAG, "initBugly: usedTime:" + (System.currentTimeMillis() - startTime));
 	}
