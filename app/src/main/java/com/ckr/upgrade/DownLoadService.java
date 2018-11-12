@@ -5,23 +5,20 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.OkHttpFactory;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
@@ -118,12 +115,10 @@ public class DownLoadService extends Service {
         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
-            String apkName = getApkName(apkUrl);
+            String apkName = ApkUtil.getApkName(apkUrl);
             Logd(TAG, "onStartCommand: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
-                File publicDirectory = MyApplication.getInstance().getApplication().getExternalFilesDir(null);
-                String absolutePath = publicDirectory.getAbsolutePath();
-                final String path = absolutePath + File.separator + apkName;
+                final String path = ApkUtil.getApkPath(apkUrl);
                 final File apkFile = new File(path);
                 long startLen = apkFile.length();
                 contentLen = upgradeInfo.fileSize;
@@ -195,30 +190,6 @@ public class DownLoadService extends Service {
         }
     }
 
-    /**
-     * 获取apk名
-     *
-     * @param apkUrl apk链接
-     * @return
-     */
-    @NonNull
-    private static String getApkName(String apkUrl) {
-        if (TextUtils.isEmpty(apkUrl)) {
-            return null;
-        }
-        int beginIndex = apkUrl.lastIndexOf("/") + 1;
-        return apkUrl.substring(beginIndex, apkUrl.length());
-    }
-
-    @NonNull
-    public static String getApkPath(String apkUrl) {
-        String apkName = getApkName(apkUrl);
-        if (TextUtils.isEmpty(apkName)) {
-            return null;
-        }
-        return MyApplication.getInstance().getApplication().getExternalFilesDir(null).getAbsolutePath() + File.separator + apkName;
-    }
-
     public void cancel(String url) {
         if (call != null) {
             if (!call.isCanceled()) {
@@ -277,48 +248,6 @@ public class DownLoadService extends Service {
         return pendingIntent;
     }
 
-    /**
-     * 安装apk
-     *
-     * @param path apk路径
-     */
-    private void installApk(String path) {
-        File apkFile = new File(path);
-        if (!apkFile.exists()) {
-            return;
-        }
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            Uri uri = parUri(apkFile, this);
-            Logd(TAG, "installApk: uri:" + uri);
-            intent.setDataAndType(uri, "application/vnd.android.package-archive");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getApplication().getApplicationContext().startActivity(intent);
-        } catch (Exception e) {
-            Logd(TAG, "installApk: exception");
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * 获取文件Uri
-     *
-     * @param file
-     * @param context
-     * @return
-     */
-    public static Uri parUri(File file, Context context) {
-        Uri imageUri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Context applicationContext = context.getApplicationContext();
-            imageUri = FileProvider.getUriForFile(applicationContext, applicationContext.getPackageName() + ".fileProvider", file);
-        } else {
-            imageUri = Uri.fromFile(file);
-        }
-        return imageUri;
-    }
 
     private final class MyHandler extends Handler {
         public MyHandler() {
@@ -373,7 +302,7 @@ public class DownLoadService extends Service {
                         if (mDownloadListener != null) {
                             mDownloadListener.onCompleted(obj.toString());
                         }
-                        installApk(obj.toString());
+                        ApkUtil.installApk(obj.toString());
                     }
                     break;
             }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.listener.MyDownloadListener;
+import com.ckr.upgrade.util.ApkUtil;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.download.DownloadTask;
@@ -161,7 +162,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment{
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
             long fileSize = upgradeInfo.fileSize;
-            String apkPath = DownLoadService.getApkPath(apkUrl);
+            String apkPath = ApkUtil.getApkPath(apkUrl);
             if (!TextUtils.isEmpty(apkPath)) {
                 File file = new File(apkPath);
                 Logd(TAG, "getApkDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);
