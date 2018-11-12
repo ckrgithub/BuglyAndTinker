@@ -14,7 +14,7 @@ import com.tencent.bugly.beta.tinker.TinkerManager;
 
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
 
     private TextView versionView;
