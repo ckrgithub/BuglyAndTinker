@@ -57,7 +57,7 @@ public class DownloadManager implements Runnable {
 
     private static DownloadManager INSTANCE;
     private final Context mContext;
-    private final LinkedList<DownloadListener> mListeners;
+    private LinkedList<DownloadListener> mListeners;
     private long downloadLen = 0;
     private long contentLen = 0;
     private int mDownloadStatus = INIT;
@@ -71,7 +71,6 @@ public class DownloadManager implements Runnable {
 
     private DownloadManager(Context context) {
         mContext = context;
-        mListeners = new LinkedList<>();
     }
 
     public static DownloadManager with(@NonNull Context context) {
@@ -104,6 +103,9 @@ public class DownloadManager implements Runnable {
      * @param listener
      */
     public void registerDownloadListener(@NonNull DownloadListener listener) {
+        if (mListeners == null) {
+            mListeners = new LinkedList<>();
+        }
         if (!mListeners.contains(listener)) {
             mListeners.add(listener);
         }
@@ -121,6 +123,20 @@ public class DownloadManager implements Runnable {
 
     public void clear() {
         mListeners.clear();
+    }
+
+    public void release() {
+        notificationManager = null;
+        builder = null;
+        if (call != null) {
+            call.cancel();
+            call = null;
+        }
+        if (mFuture != null) {
+            mFuture.cancel(true);
+            mFuture = null;
+        }
+        mExecutor = null;
     }
 
     /**
@@ -362,9 +378,11 @@ public class DownloadManager implements Runnable {
                             Notification notification = builder.build();
                             notificationManager.notify(NOTIFY_ID, notification);
                         }
-                        for (DownloadListener mListener : mListeners) {
-                            if (mListener != null) {
-                                mListener.onReceive(contentLen, downloadLen, progress);
+                        if (mListeners != null) {
+                            for (DownloadListener mListener : mListeners) {
+                                if (mListener != null) {
+                                    mListener.onReceive(contentLen, downloadLen, progress);
+                                }
                             }
                         }
                     }
@@ -373,9 +391,11 @@ public class DownloadManager implements Runnable {
                     mDownloadStatus = FAILED;
                     obj = msg.obj;
                     if (obj instanceof IOException) {
-                        for (DownloadListener mListener : mListeners) {
-                            if (mListener != null) {
-                                mListener.onFailed((IOException) obj);
+                        if (mListeners != null) {
+                            for (DownloadListener mListener : mListeners) {
+                                if (mListener != null) {
+                                    mListener.onFailed((IOException) obj);
+                                }
                             }
                         }
                     }
@@ -392,9 +412,11 @@ public class DownloadManager implements Runnable {
 //                    }
                     obj = msg.obj;
                     if (obj != null) {
-                        for (DownloadListener mListener : mListeners) {
-                            if (mListener != null) {
-                                mListener.onCompleted(obj.toString());
+                        if (mListeners != null) {
+                            for (DownloadListener mListener : mListeners) {
+                                if (mListener != null) {
+                                    mListener.onCompleted(obj.toString());
+                                }
                             }
                         }
                         ApkUtil.installApk(obj.toString());
