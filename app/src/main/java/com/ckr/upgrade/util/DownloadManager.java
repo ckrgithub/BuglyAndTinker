@@ -146,10 +146,14 @@ public class DownloadManager implements Runnable {
 	public void pauseDownload() {
 		Logd(TAG, "pauseDownload: ");
 		mDownloadStatus = PAUSED;
+		boolean isPause = true;
 		if (mFuture != null) {
-			boolean cancel = mFuture.cancel(true);
+			isPause = mFuture.cancel(true);
 			mFuture = null;
-			Loge(TAG, "pauseDownload: cancel:" + cancel);
+			Loge(TAG, "pauseDownload: isPause:" + isPause);
+		}
+		if (isPause) {
+			onPause();
 		}
 	}
 
@@ -192,12 +196,13 @@ public class DownloadManager implements Runnable {
 		}
 		// 设置参数
 		builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
+		String string = mContext.getResources().getString(R.string.app_name);
 		builder.setDefaults(Notification.DEFAULT_LIGHTS)
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
-				.setTicker("app更新中")
+				.setTicker(string + "更新中")
 				.setLights(Color.BLUE, 5000, 500)
 				.setAutoCancel(true)
-				.setContentTitle("bugly")
+				.setContentTitle(string)
 				.setContentText("下载中")
 				.setContentInfo("0%")
 				.setWhen(System.currentTimeMillis())
@@ -361,7 +366,7 @@ public class DownloadManager implements Runnable {
 				}
 			}
 			outputStream.flush();
-			cancelNotification();
+			onComplete();
 			sendCompleteMsg(apkFile.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -410,6 +415,7 @@ public class DownloadManager implements Runnable {
 				case FAILED:
 					Logd(TAG, "handleMessage: FAILED");
 					mDownloadStatus = FAILED;
+					onFailure();
 					obj = msg.obj;
 					if (obj instanceof IOException) {
 						if (mListeners != null) {
@@ -441,10 +447,33 @@ public class DownloadManager implements Runnable {
 	}
 
 	/**
-	 * 取消广播
+	 * 下载暂停处理
 	 */
-	private void cancelNotification() {
+	private void onPause() {
 		Notification notification = builder.build();
+		builder.setContentText("暂停中");
+		builder.setContentIntent(getPendingIntent(PAUSED));
+		notificationManager.notify(NOTIFY_ID, notification);
+	}
+
+	/**
+	 * 下载失败处理
+	 */
+	private void onFailure() {
+		Notification notification = builder.build();
+		builder.setContentText("下载失败");
+		builder.setContentIntent(getPendingIntent(FAILED));
+		notificationManager.notify(NOTIFY_ID, notification);
+	}
+
+	/**
+	 * 下载完成处理
+	 */
+	private void onComplete() {
+		Notification notification = builder.build();
+		builder.setContentText("下载完成");
+		builder.setProgress(100, 100, false);
+		builder.setContentInfo("100%");
 		builder.setContentIntent(getPendingIntent(COMPLETE));
 //                            notification.flags = Notification.FLAG_AUTO_CANCEL;
 		notificationManager.notify(NOTIFY_ID, notification);
@@ -463,6 +492,7 @@ public class DownloadManager implements Runnable {
 		Logd(TAG, "updateProgress: mDownloadStatus:" + mStatus + ",progress:" + progress);
 		builder.setProgress(100, progress, false);
 		builder.setContentInfo(progress + "%");
+		builder.setContentText("下载中");
 		if (mStatus != DOWNLOADING) {
 			builder.setContentIntent(getPendingIntent(DOWNLOADING));
 		}
