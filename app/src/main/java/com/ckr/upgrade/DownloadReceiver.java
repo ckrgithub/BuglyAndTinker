@@ -36,13 +36,13 @@ public class DownloadReceiver extends BroadcastReceiver {
 			Logd(TAG, "onReceive: status:" + status + ",url:" + url);
 			switch (status) {
 				case DOWNLOADING:
-					DownloadManager.with(context).pauseDownload();
+					DownloadManager.with(context.getApplicationContext()).pauseDownload();
 					break;
 				case COMPLETE:
 					ApkUtil.installApk(url);
 					break;
 				case PAUSED:
-					DownloadManager.with(context).resumeDownload();
+					DownloadManager.with(context.getApplicationContext()).resumeDownload();
 					break;
 				case FAILED:
 

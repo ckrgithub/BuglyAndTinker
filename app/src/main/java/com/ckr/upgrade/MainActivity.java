@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //        register();
 	}
 
-	private void setOnClickListener(@IdRes int viewId){
+	private void setOnClickListener(@IdRes int viewId) {
 		findViewById(viewId).setOnClickListener(this);
 	}
 
@@ -91,17 +91,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 				}).start();
 				break;
 			case R.id.btnDownload:
-				DownloadManager.with(this).startDownload();
+				DownloadManager with = DownloadManager.with(this.getApplicationContext());
+				if (with.getDownloadStatus() == DownloadManager.PAUSED) {
+					with.resumeDownload();
+				} else {
+					with.startDownload();
+				}
 				break;
 			case R.id.btnPause:
-				DownloadManager.with(this).pauseDownload();
+				DownloadManager.with(this.getApplicationContext()).pauseDownload();
 				break;
 		}
 	}
 
 	private void register() {
-		downloadReceiver = new DownloadReceiver(this);
-		IntentFilter filter = new IntentFilter(DownloadReceiver.DOWNLOAD_RECEIVER);
+		downloadReceiver = new DownloadReceiver();
+		IntentFilter filter = new IntentFilter(DownloadReceiver.APK_DOWNLOAD_RECEIVER);
 		registerReceiver(downloadReceiver, filter);
 	}
 }
