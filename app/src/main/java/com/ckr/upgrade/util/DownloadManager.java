@@ -34,7 +34,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static com.ckr.upgrade.DownloadReceiver.DOWNLOAD_RECEIVER;
+import static com.ckr.upgrade.DownloadReceiver.APK_DOWNLOAD_RECEIVER;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
@@ -221,7 +221,7 @@ public class DownloadManager implements Runnable {
 
 	private PendingIntent getPendingIntent(int downloadStatus) {
 		Intent intent = new Intent();
-		intent.setAction(DOWNLOAD_RECEIVER);
+		intent.setAction(APK_DOWNLOAD_RECEIVER);
 		intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
 		UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
 		if (upgradeInfo != null) {
@@ -477,6 +477,7 @@ public class DownloadManager implements Runnable {
 		builder.setContentIntent(getPendingIntent(COMPLETE));
 //                            notification.flags = Notification.FLAG_AUTO_CANCEL;
 		notificationManager.notify(NOTIFY_ID, notification);
+//		notification.contentView.setTextViewText(android.support.compat.R.id.text,"下载完成");
 //                    if (notificationManager != null) {
 //                        notificationManager.cancel(NOTIFY_ID);
 //                    }

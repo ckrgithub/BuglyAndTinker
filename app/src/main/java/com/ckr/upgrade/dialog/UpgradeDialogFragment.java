@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
-import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.DownloadReceiver;
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.listener.DownloadListener;
@@ -174,8 +173,8 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
     private DownloadReceiver downloadReceiver;
 
     private void register() {
-        downloadReceiver = new DownloadReceiver(this);
-        IntentFilter filter = new IntentFilter(DownloadReceiver.DOWNLOAD_RECEIVER);
+        downloadReceiver = new DownloadReceiver();
+        IntentFilter filter = new IntentFilter(DownloadReceiver.APK_DOWNLOAD_RECEIVER);
         getContext().registerReceiver(downloadReceiver, filter);
     }
 
