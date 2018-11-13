@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import static com.ckr.upgrade.DownLoadService.APK_URL;
-import static com.ckr.upgrade.DownLoadService.COMPLETE;
-import static com.ckr.upgrade.DownLoadService.DOWNLOADING;
-import static com.ckr.upgrade.DownLoadService.DOWNLOAD_PROGRESS;
-import static com.ckr.upgrade.DownLoadService.INIT;
+import com.ckr.upgrade.listener.DownloadListener;
+
+import static com.ckr.upgrade.util.DownloadManager.APK_URL;
+import static com.ckr.upgrade.util.DownloadManager.COMPLETE;
+import static com.ckr.upgrade.util.DownloadManager.DOWNLOADING;
+import static com.ckr.upgrade.util.DownloadManager.DOWNLOAD_PROGRESS;
+import static com.ckr.upgrade.util.DownloadManager.INIT;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
@@ -20,7 +22,7 @@ public class DownloadReceiver extends BroadcastReceiver {
     private static final String TAG = "DownloadReceiver";
     public static final String DOWNLOAD_RECEIVER = "apk_download_receiver";
     private MainActivity activity;
-    private DownLoadService.DownloadListener mListener;
+    private DownloadListener mListener;
 
     public DownloadReceiver() {
     }
@@ -28,7 +30,7 @@ public class DownloadReceiver extends BroadcastReceiver {
     public DownloadReceiver(MainActivity activity) {
         this.activity = activity;
     }
-    public DownloadReceiver(DownLoadService.DownloadListener listener) {
+    public DownloadReceiver(DownloadListener listener) {
         this.mListener = listener;
     }
 

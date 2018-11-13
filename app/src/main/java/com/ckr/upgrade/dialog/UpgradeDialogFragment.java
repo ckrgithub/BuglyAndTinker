@@ -10,28 +10,31 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.DownloadReceiver;
 import com.ckr.upgrade.R;
-import com.ckr.upgrade.listener.MyDownloadListener;
+import com.ckr.upgrade.listener.DownloadListener;
 import com.ckr.upgrade.util.ApkUtil;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
-import com.tencent.bugly.beta.download.DownloadTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import static com.ckr.upgrade.util.DownloadManager.COMPLETE;
+import static com.ckr.upgrade.util.DownloadManager.DELETED;
+import static com.ckr.upgrade.util.DownloadManager.FAILED;
+import static com.ckr.upgrade.util.DownloadManager.INIT;
+import static com.ckr.upgrade.util.DownloadManager.PAUSED;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/11.
  */
 
-public class UpgradeDialogFragment extends BaseDialogFragment implements DownLoadService.DownloadListener{
+public class UpgradeDialogFragment extends BaseDialogFragment implements DownloadListener {
     private static final String TAG = "BaseDialogFragment";
 
     private static final String KEY_POSITIVE = "positive";
@@ -125,15 +128,15 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements DownLoa
         }
         int apkDownloadStatus = getApkDownloadStatus();
         switch (apkDownloadStatus) {
-            case DownLoadService.INIT:
+            case INIT:
                 break;
-            case DownLoadService.COMPLETE:
+            case COMPLETE:
                 positive = "立即安装";
                 break;
-            case DownLoadService.PAUSED:
+            case PAUSED:
                 positive = "继续下载";
                 break;
-            case DownLoadService.FAILED:
+            case FAILED:
                 break;
         }
         btnOK.setText(positive);
@@ -150,7 +153,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements DownLoa
                     dismiss();
                 }
                 if (onDialogClickListener != null) {
-                    if (getApkDownloadStatus() == DownLoadService.COMPLETE) {
+                    if (getApkDownloadStatus() == COMPLETE) {
                         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
                         if (upgradeInfo != null) {
                             String apkUrl = upgradeInfo.apkUrl;
@@ -205,14 +208,14 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements DownLoa
                 Logd(TAG, "getApkDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);
                 if (file.exists()) {
                     if (file.length() == fileSize) {
-                        return DownLoadService.COMPLETE;
+                        return COMPLETE;
                     } else {
-                        return DownLoadService.DELETED;
+                        return DELETED;
                     }
                 }
             }
         }
-        return DownLoadService.INIT;
+        return INIT;
     }
 
     @Override

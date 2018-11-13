@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.ckr.upgrade.util.DownloadManager;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.tinker.TinkerManager;
@@ -38,6 +39,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         checkUpgrade.setOnClickListener(this);
         findViewById(R.id.btnService).setOnClickListener(this);
         findViewById(R.id.btnReceiver).setOnClickListener(this);
+        findViewById(R.id.btnNotification).setOnClickListener(this);
 
         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
         String versionName = null;
@@ -72,6 +74,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btnReceiver:
                 register();
+                break;
+            case R.id.btnNotification:
+                DownloadManager with = DownloadManager.with(this.getApplicationContext());
+                with.sendNotification();
                 break;
         }
     }

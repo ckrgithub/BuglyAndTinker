@@ -65,5 +65,13 @@
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/btnService"
         app:layout_constraintTop_toTopOf="@+id/btnService" />
+    <Button
+        android:id="@+id/btnNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送通知"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/btnReceiver"
+        app:layout_constraintTop_toTopOf="@+id/btnReceiver" />
 
 </android.support.constraint.ConstraintLayout>
