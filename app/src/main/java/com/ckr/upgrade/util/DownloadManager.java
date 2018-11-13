@@ -36,393 +36,437 @@ import okhttp3.Response;
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.ckr.upgrade.DownloadReceiver.DOWNLOAD_RECEIVER;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 /**
  * Created by ckr on 2018/11/13.
  */
 
 public class DownloadManager implements Runnable {
-    private static final String TAG = "DownloadManager";
-    public static final String DOWNLOAD_PROGRESS = "download_progress";
-    public static final String APK_URL = "apk_url";
-    private static final String CHANNEL_ID = "ckrgithub";
-    private static final String CHANNEL_NAME = "upgrade";
-    public final static int INIT = 0;
-    public final static int COMPLETE = 1;
-    public final static int DOWNLOADING = 2;
-    public final static int PAUSED = 3;
-    public final static int DELETED = 4;
-    public final static int FAILED = 5;
-    private final static int NOTIFY_ID = 1111;
+	private static final String TAG = "DownloadManager";
+	public static final String DOWNLOAD_PROGRESS = "download_progress";
+	public static final String APK_URL = "apk_url";
+	private static final String CHANNEL_ID = "ckrgithub";
+	private static final String CHANNEL_NAME = "upgrade";
+	public final static int INIT = 0;
+	public final static int COMPLETE = 1;
+	public final static int DOWNLOADING = 2;
+	public final static int PAUSED = 3;
+	public final static int DELETED = 4;
+	public final static int FAILED = 5;
+	private final static int NOTIFY_ID = 1129;
 
-    private static DownloadManager INSTANCE;
-    private final Context mContext;
-    private LinkedList<DownloadListener> mListeners;
-    private long downloadLen = 0;
-    private long contentLen = 0;
-    private int mDownloadStatus = INIT;
-    private MyHandler mHandler;
-    private NotificationManager notificationManager;
-    private NotificationCompat.Builder builder;
-    private Call call;
-    private ExecutorService mExecutor;
-    private Future<?> mFuture;
+	private static DownloadManager INSTANCE;
+	private final Context mContext;
+	private LinkedList<DownloadListener> mListeners;
+	private int mDownloadStatus = INIT;
+	private MyHandler mHandler;
+	private NotificationManager notificationManager;
+	private NotificationCompat.Builder builder;
+	private ExecutorService mExecutor;
+	private Future<?> mFuture;
 
 
-    private DownloadManager(Context context) {
-        mContext = context;
-    }
+	private DownloadManager(Context context) {
+		mContext = context;
+	}
 
-    public static DownloadManager with(@NonNull Context context) {
-        if (INSTANCE == null) {
-            synchronized (DownloadManager.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new DownloadManager(context);
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static DownloadManager with(@NonNull Context context) {
+		if (INSTANCE == null) {
+			synchronized (DownloadManager.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new DownloadManager(context);
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    public Context getContext() {
-        return mContext;
-    }
+	public Context getContext() {
+		return mContext;
+	}
 
-    /**
-     * 下载状态
-     *
-     * @return
-     */
-    public int getDownloadStatus() {
-        return mDownloadStatus;
-    }
+	/**
+	 * 下载状态
+	 *
+	 * @return
+	 */
+	public int getDownloadStatus() {
+		return mDownloadStatus;
+	}
 
-    /**
-     * 注册下载监听器
-     *
-     * @param listener
-     */
-    public void registerDownloadListener(@NonNull DownloadListener listener) {
-        if (mListeners == null) {
-            mListeners = new LinkedList<>();
-        }
-        if (!mListeners.contains(listener)) {
-            mListeners.add(listener);
-        }
-    }
+	/**
+	 * 注册下载监听器
+	 *
+	 * @param listener
+	 */
+	public void registerDownloadListener(@NonNull DownloadListener listener) {
+		if (mListeners == null) {
+			mListeners = new LinkedList<>();
+		}
+		if (!mListeners.contains(listener)) {
+			mListeners.add(listener);
+		}
+	}
 
-    /**
-     * 移除下载监听器
-     *
-     * @param listener
-     * @return
-     */
-    public boolean unregisterDownloadListener(@NonNull DownloadListener listener) {
-        return mListeners.remove(listener);
-    }
+	/**
+	 * 移除下载监听器
+	 *
+	 * @param listener
+	 * @return
+	 */
+	public boolean unregisterDownloadListener(@NonNull DownloadListener listener) {
+		return mListeners.remove(listener);
+	}
 
-    public void clear() {
-        mListeners.clear();
-    }
+	/**
+	 * 移除所有监听器
+	 */
+	public void clear() {
+		mListeners.clear();
+	}
 
-    public void release() {
-        notificationManager = null;
-        builder = null;
-        if (call != null) {
-            call.cancel();
-            call = null;
-        }
-        if (mFuture != null) {
-            mFuture.cancel(true);
-            mFuture = null;
-        }
-        mExecutor = null;
-    }
+	/**
+	 * 释放资源
+	 */
+	public void release() {
+		Logd(TAG, "release: ");
+		notificationManager = null;
+		builder = null;
+		if (mFuture != null) {
+			mFuture.cancel(true);
+			mFuture = null;
+		}
+		mExecutor = null;
+	}
 
-    /**
-     * 停止下载
-     */
-    public void pauseDownload() {
-        mDownloadStatus = PAUSED;
-        if (call != null) {
-            if (!call.isCanceled()) {
-                call.cancel();
-                call = null;
-            }
-        }
-    }
+	/**
+	 * 停止下载
+	 */
+	public void pauseDownload() {
+		Logd(TAG, "pauseDownload: ");
+		mDownloadStatus = PAUSED;
+		if (mFuture != null) {
+			boolean cancel = mFuture.cancel(true);
+			mFuture = null;
+			Loge(TAG, "pauseDownload: cancel:" + cancel);
+		}
+	}
 
-    /**
-     * 继续下载
-     */
-    public void resumeDownload() {
-        submit();
-    }
+	/**
+	 * 继续下载
+	 */
+	public void resumeDownload() {
+		Logd(TAG, "resumeDownload: ");
+		submit();
+	}
 
-    /**
-     * 开始下载
-     */
-    public void startDownload() {
-        if (mDownloadStatus == DownloadManager.DOWNLOADING) {
-            return;
-        }
-        mDownloadStatus = INIT;
-        if (mHandler == null) {
-            mHandler = new MyHandler();
-        }
-        sendNotification();
-        submit();
-    }
+	/**
+	 * 开始下载
+	 */
+	public void startDownload() {
+		Logd(TAG, "startDownload: mDownloadStatus:" + mDownloadStatus);
+		if (mDownloadStatus == DownloadManager.DOWNLOADING) {
+			return;
+		}
+		mDownloadStatus = INIT;
+		if (mHandler == null) {
+			mHandler = new MyHandler();
+		}
+		submit();
+	}
 
-    /**
-     * 发送通知
-     */
-    public void sendNotification() {
-        notificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
-        // 8.0适配
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            final NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(channel);
-        }
-        // 设置参数
-        builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
-        builder.setDefaults(Notification.DEFAULT_LIGHTS)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setTicker("app更新中")
-                .setLights(Color.BLUE, 5000, 500)
-                .setAutoCancel(true)
-                .setContentTitle("bugly")
-                .setContentText("下载中")
-                .setContentInfo("0%")
-                .setWhen(System.currentTimeMillis())
-                .setContentIntent(getPendingIntent(INIT))
-                .setOngoing(true)
-                .setSmallIcon(R.mipmap.ic_launcher);
+	/**
+	 * 发送通知
+	 */
+	public void sendNotification() {
+		Logd(TAG, "sendNotification: ");
+		notificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+		// 8.0适配
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			final NotificationChannel channel = new NotificationChannel(
+					CHANNEL_ID,
+					CHANNEL_NAME,
+					NotificationManager.IMPORTANCE_HIGH);
+			notificationManager.createNotificationChannel(channel);
+		}
+		// 设置参数
+		builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
+		builder.setDefaults(Notification.DEFAULT_LIGHTS)
+				.setPriority(NotificationCompat.PRIORITY_HIGH)
+				.setTicker("app更新中")
+				.setLights(Color.BLUE, 5000, 500)
+				.setAutoCancel(true)
+				.setContentTitle("bugly")
+				.setContentText("下载中")
+				.setContentInfo("0%")
+				.setWhen(System.currentTimeMillis())
+				.setContentIntent(getPendingIntent(INIT))
+				.setOngoing(true)
+				.setSmallIcon(R.mipmap.ic_launcher);
 
-        Notification notification = builder.build();
-        notification.defaults = Notification.DEFAULT_LIGHTS;
-        notification.defaults = Notification.DEFAULT_VIBRATE;
-        notification.defaults = Notification.DEFAULT_SOUND;
-        notification.flags = Notification.FLAG_ONGOING_EVENT;
+		Notification notification = builder.build();
+		notification.defaults = Notification.DEFAULT_LIGHTS;
+		notification.defaults = Notification.DEFAULT_VIBRATE;
+		notification.defaults = Notification.DEFAULT_SOUND;
+		notification.flags = Notification.FLAG_ONGOING_EVENT;
 
-        notificationManager.notify(NOTIFY_ID, notification);
-    }
+		notificationManager.notify(NOTIFY_ID, notification);
+	}
 
-    private PendingIntent getPendingIntent(int downloadStatus) {
-        Intent intent = new Intent();
-        intent.setAction(DOWNLOAD_RECEIVER);
-        intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
-        if (upgradeInfo != null) {
-            String apkUrl = upgradeInfo.apkUrl;
-            intent.putExtra(APK_URL, apkUrl);
-        }
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return pendingIntent;
-    }
+	private PendingIntent getPendingIntent(int downloadStatus) {
+		Intent intent = new Intent();
+		intent.setAction(DOWNLOAD_RECEIVER);
+		intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
+		UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+		if (upgradeInfo != null) {
+			String apkUrl = upgradeInfo.apkUrl;
+			intent.putExtra(APK_URL, apkUrl);
+		}
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return pendingIntent;
+	}
 
-    /**
-     * 提交任务
-     */
-    private void submit() {
-        if (mExecutor == null) {
-            mExecutor = Executors.newSingleThreadExecutor();
-        }
-        if (mFuture != null) {
-            boolean cancel = mFuture.cancel(true);
-            Logd(TAG, "download: cancel:" + cancel);
-        }
-        mFuture = mExecutor.submit(this);
-    }
+	/**
+	 * 提交任务
+	 */
+	private void submit() {
+		if (mExecutor == null) {
+			mExecutor = Executors.newSingleThreadExecutor();
+		}
+		if (mFuture != null) {
+			boolean cancel = mFuture.cancel(true);
+			Logd(TAG, "submit: cancel:" + cancel);
+		}
+		mFuture = mExecutor.submit(this);
+	}
 
-    @Override
-    public void run() {
-        downloadApk();
-    }
+	@Override
+	public void run() {
+		Logd(TAG, "run: ");
+		sendNotification();
+		downloadApk();
+	}
 
-    private void downloadApk() {
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
-        if (upgradeInfo != null) {
-            String apkUrl = upgradeInfo.apkUrl;
-            String apkName = ApkUtil.getApkName(apkUrl);
-            Logd(TAG, "onStartCommand: apkName:" + apkName);
-            if (!TextUtils.isEmpty(apkName)) {
-                final String path = ApkUtil.getApkPath(apkUrl);
-                final File apkFile = new File(path);
-                long startLen = apkFile.length();
-                contentLen = upgradeInfo.fileSize;
-                downloadLen = (int) startLen;
-                if (contentLen == downloadLen) {
-                    sendCompleteMsg(path);
-                    return;
-                }
-                Logd(TAG, "onStartCommand: downloadLen:" + downloadLen + ",contentLen:" + contentLen + ",exist:" + apkFile.exists());
-                final Request request = new Request.Builder()
-                        .addHeader("RANGE", "bytes=" + startLen + "-" + contentLen)
-                        .url(apkUrl)
-                        .build();
-                call = OkHttpFactory.createOkHttp().newCall(request);
-                try {
-                    Response response = call.execute();
-                    writeApk(response, apkFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    sendFailureMsg(e);
-                }
-            }
-        }
-    }
+	/**
+	 * 下载apk
+	 */
+	private void downloadApk() {
+		Logd(TAG, "downloadApk: ");
+		UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+		if (upgradeInfo != null) {
+			String apkUrl = upgradeInfo.apkUrl;
+			String apkName = ApkUtil.getApkName(apkUrl);
+			Logd(TAG, "downloadApk: apkName:" + apkName);
+			if (!TextUtils.isEmpty(apkName)) {
+				final String path = ApkUtil.getApkPath(apkUrl);
+				final File apkFile = new File(path);
+				long startLen = apkFile.length();
+				long contentLen = upgradeInfo.fileSize;
+				Logd(TAG, "downloadApk: contentLen:" + contentLen + ",startLen:" + startLen);
+				if (contentLen == startLen) {
+					sendCompleteMsg(path);
+					return;
+				}
+				final Request request = new Request.Builder()
+						.addHeader("RANGE", "bytes=" + startLen + "-" + contentLen)
+						.url(apkUrl)
+						.build();
+				Call call = OkHttpFactory.createOkHttp().newCall(request);
+				try {
+					Response response = call.execute();
+					writeApk(response, apkFile, contentLen, startLen);
+				} catch (IOException e) {
+					e.printStackTrace();
+					sendFailureMsg(e);
+				}
+			}
+		}
+	}
 
-    /**
-     * 发送下载完成消息
-     *
-     * @param path apk路径
-     */
-    private void sendCompleteMsg(String path) {
-        if (mHandler != null) {
-            Message message = mHandler.obtainMessage();
-            message.what = COMPLETE;
-            message.obj = path;
-            mHandler.sendMessage(message);
-        }
-    }
+	/**
+	 * 发送下载完成消息
+	 *
+	 * @param path apk路径
+	 */
+	private void sendCompleteMsg(String path) {
+		Logd(TAG, "sendCompleteMsg: path:" + path + ",mHandler:" + mHandler);
+		if (mHandler != null) {
+			Message message = mHandler.obtainMessage();
+			message.what = COMPLETE;
+			message.obj = path;
+			mHandler.sendMessage(message);
+		}
+	}
 
-    /**
-     * 发送下载失败消息
-     *
-     * @param e 异常对象
-     */
-    private void sendFailureMsg(IOException e) {
-        if (mHandler != null) {
-            Message message = mHandler.obtainMessage();
-            message.what = FAILED;
-            message.obj = e;
-            mHandler.sendMessage(message);
-        }
-    }
+	/**
+	 * 发送下载失败消息
+	 *
+	 * @param e 异常对象
+	 */
+	private void sendFailureMsg(IOException e) {
+		Logd(TAG, "sendFailureMsg: e:" + e.getMessage() + ",mHandler:" + mHandler);
+		if (mHandler != null) {
+			Message message = mHandler.obtainMessage();
+			message.what = FAILED;
+			message.obj = e;
+			mHandler.sendMessage(message);
+		}
+	}
 
-    /**
-     * 发送下载进度消息
-     */
-    private void sendProgressMsg() {
-        if (mHandler != null) {
-            Message message = mHandler.obtainMessage();
-            message.what = DOWNLOADING;
-            message.obj = downloadLen;
-            mHandler.sendMessage(message);
-        }
-    }
+	/**
+	 * 发送下载进度消息
+	 *
+	 * @param contentLen
+	 * @param downloadLen
+	 * @param progress
+	 */
+	private void sendProgressMsg(int contentLen, int downloadLen, int progress) {
+		Logd(TAG, "sendProgressMsg: contentLen:" + contentLen + ",downloadLen:" + downloadLen + "sendProgressMsg: progress:" + progress + ",mHandler:" + mHandler);
+		if (mHandler != null) {
+			Message message = mHandler.obtainMessage();
+			message.what = DOWNLOADING;
+			message.obj = progress;
+			message.arg1 = contentLen;
+			message.arg2 = downloadLen;
+			mHandler.sendMessage(message);
+		}
+	}
 
-    /**
-     * 写入apk文件
-     *
-     * @param response
-     * @param apkFile
-     */
-    private void writeApk(Response response, File apkFile) {
-        InputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        try {
-            inputStream = response.body().byteStream();
-            outputStream = new FileOutputStream(apkFile, true);
-            byte[] buffer = new byte[2048];
-            int len = 0;
-            while ((len = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, len);
-                downloadLen += len;
-                sendProgressMsg();
-            }
-            outputStream.flush();
-            sendCompleteMsg(apkFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            sendFailureMsg(e);
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	/**
+	 * 写入apk文件
+	 *
+	 * @param response
+	 * @param apkFile
+	 * @param contentLen
+	 * @param startLen
+	 */
+	private void writeApk(Response response, File apkFile, long contentLen, long startLen) {
+		long downloadLen = startLen;
+		InputStream inputStream = null;
+		FileOutputStream outputStream = null;
+		try {
+			inputStream = response.body().byteStream();
+			outputStream = new FileOutputStream(apkFile, true);
+			byte[] buffer = new byte[2048];
+			int len = 0;
+			while ((len = inputStream.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, len);
+				downloadLen += len;
+				int progress = (int) (downloadLen * 100 / contentLen);
+				Logd(TAG, "writeApk: progress:" + progress);
+				if (progress < 100) {
+					updateProgress(mDownloadStatus, progress);
+					sendProgressMsg((int) contentLen, (int) startLen, progress);
+				}
+			}
+			outputStream.flush();
+			cancelNotification();
+			sendCompleteMsg(apkFile.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+			sendFailureMsg(e);
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+				if (outputStream != null) {
+					outputStream.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    private final class MyHandler extends Handler {
-        public MyHandler() {
-            super(Looper.myLooper());
-        }
+	private final class MyHandler extends Handler {
+		public MyHandler() {
+			super(Looper.myLooper());
+		}
 
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case DOWNLOADING:
-                    int mStatus = mDownloadStatus;
-                    mDownloadStatus = DOWNLOADING;
-                    Object obj = msg.obj;
-                    if (obj instanceof Long) {
-                        Long downloadLen = (Long) obj;
-                        int progress = (int) (downloadLen * 100 / contentLen);
-                        if (progress < 100) {
-                            builder.setProgress(100, progress, false);
-                            builder.setContentInfo(progress + "%");
-                            if (mStatus != DOWNLOADING) {
-                                builder.setContentIntent(getPendingIntent(DOWNLOADING));
-                            }
-                            Notification notification = builder.build();
-                            notificationManager.notify(NOTIFY_ID, notification);
-                        }
-                        if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
-                                if (mListener != null) {
-                                    mListener.onReceive(contentLen, downloadLen, progress);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case FAILED:
-                    mDownloadStatus = FAILED;
-                    obj = msg.obj;
-                    if (obj instanceof IOException) {
-                        if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
-                                if (mListener != null) {
-                                    mListener.onFailed((IOException) obj);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case COMPLETE:
-                    mDownloadStatus = COMPLETE;
-                    Notification notification = builder.build();
-                    builder.setContentIntent(getPendingIntent(COMPLETE));
+		@Override
+		public void handleMessage(Message msg) {
+			int what = msg.what;
+			Logd(TAG, "handleMessage: what:" + what);
+			switch (what) {
+				case DOWNLOADING:
+					Logd(TAG, "handleMessage: DOWNLOADING");
+					mDownloadStatus = DOWNLOADING;
+					Object obj = msg.obj;
+					if (obj instanceof Integer) {
+						int contentLen = msg.arg1;
+						int downloadLen = msg.arg2;
+						int progress = (int) obj;
+						if (mListeners != null) {
+							for (DownloadListener mListener : mListeners) {
+								if (mListener != null) {
+									mListener.onReceive(contentLen, downloadLen, progress);
+								}
+							}
+						}
+					}
+					break;
+				case FAILED:
+					Logd(TAG, "handleMessage: FAILED");
+					mDownloadStatus = FAILED;
+					obj = msg.obj;
+					if (obj instanceof IOException) {
+						if (mListeners != null) {
+							for (DownloadListener mListener : mListeners) {
+								if (mListener != null) {
+									mListener.onFailed((IOException) obj);
+								}
+							}
+						}
+					}
+					break;
+				case COMPLETE:
+					Logd(TAG, "handleMessage: COMPLETE");
+					mDownloadStatus = COMPLETE;
+					obj = msg.obj;
+					if (obj != null) {
+						if (mListeners != null) {
+							for (DownloadListener mListener : mListeners) {
+								if (mListener != null) {
+									mListener.onCompleted(obj.toString());
+								}
+							}
+						}
+						ApkUtil.installApk(obj.toString());
+					}
+					break;
+			}
+		}
+	}
+
+	/**
+	 * 取消广播
+	 */
+	private void cancelNotification() {
+		Notification notification = builder.build();
+		builder.setContentIntent(getPendingIntent(COMPLETE));
 //                            notification.flags = Notification.FLAG_AUTO_CANCEL;
-//                                stopSelf();
-                    notificationManager.notify(NOTIFY_ID, notification);
+		notificationManager.notify(NOTIFY_ID, notification);
 //                    if (notificationManager != null) {
 //                        notificationManager.cancel(NOTIFY_ID);
 //                    }
-                    obj = msg.obj;
-                    if (obj != null) {
-                        if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
-                                if (mListener != null) {
-                                    mListener.onCompleted(obj.toString());
-                                }
-                            }
-                        }
-                        ApkUtil.installApk(obj.toString());
-                    }
-                    break;
-            }
-        }
-    }
+	}
+
+	/**
+	 * 更新广播进度
+	 *
+	 * @param mStatus
+	 * @param progress
+	 */
+	private void updateProgress(int mStatus, int progress) {
+		Logd(TAG, "updateProgress: mDownloadStatus:" + mStatus + ",progress:" + progress);
+		builder.setProgress(100, progress, false);
+		builder.setContentInfo(progress + "%");
+		if (mStatus != DOWNLOADING) {
+			builder.setContentIntent(getPendingIntent(DOWNLOADING));
+		}
+		Notification notification = builder.build();
+		notificationManager.notify(NOTIFY_ID, notification);
+	}
 }

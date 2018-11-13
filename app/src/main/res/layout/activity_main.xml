@@ -73,5 +73,21 @@
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/btnReceiver"
         app:layout_constraintTop_toTopOf="@+id/btnReceiver" />
+    <Button
+        android:id="@+id/btnDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始下载"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnService" />
+    <Button
+        android:id="@+id/btnPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暂停下载"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/btnDownload"
+        app:layout_constraintTop_toTopOf="@+id/btnDownload" />
 
 </android.support.constraint.ConstraintLayout>
