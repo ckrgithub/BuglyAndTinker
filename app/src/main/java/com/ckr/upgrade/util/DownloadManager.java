@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,8 +53,9 @@ public class DownloadManager implements Runnable {
 	public final static int COMPLETE = 1;
 	public final static int DOWNLOADING = 2;
 	public final static int PAUSED = 3;
-	public final static int DELETED = 4;
-	public final static int FAILED = 5;
+	public final static int RESUMED = 4;
+	public final static int DELETED = 5;
+	public final static int FAILED = 6;
 	private final static int NOTIFY_ID = 1129;
 
 	private static DownloadManager INSTANCE;
@@ -146,14 +148,10 @@ public class DownloadManager implements Runnable {
 	public void pauseDownload() {
 		Logd(TAG, "pauseDownload: ");
 		mDownloadStatus = PAUSED;
-		boolean isPause = true;
 		if (mFuture != null) {
-			isPause = mFuture.cancel(true);
+			boolean isPause = mFuture.cancel(true);
 			mFuture = null;
 			Loge(TAG, "pauseDownload: isPause:" + isPause);
-		}
-		if (isPause) {
-			onPause();
 		}
 	}
 
@@ -162,6 +160,7 @@ public class DownloadManager implements Runnable {
 	 */
 	public void resumeDownload() {
 		Logd(TAG, "resumeDownload: ");
+		mDownloadStatus = RESUMED;
 		submit();
 	}
 
@@ -197,24 +196,25 @@ public class DownloadManager implements Runnable {
 		// 设置参数
 		builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
 		String string = mContext.getResources().getString(R.string.app_name);
-		builder.setDefaults(Notification.DEFAULT_LIGHTS)
+		builder.setSmallIcon(R.mipmap.ic_launcher)//设置小图标
+				.setContentTitle(string)//设置通知标题
+				.setContentText("下载中")//设置通知内容
+				.setWhen(System.currentTimeMillis())//设置通知时间
+				.setAutoCancel(false)//点击通知后是否自动清除
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
-				.setTicker(string + "更新中")
-				.setLights(Color.BLUE, 5000, 500)
-				.setAutoCancel(true)
-				.setContentTitle(string)
-				.setContentText("下载中")
 				.setContentInfo("0%")
-				.setWhen(System.currentTimeMillis())
+				.setTicker(string + "更新中")
+				.setDefaults(Notification.DEFAULT_LIGHTS)
+				.setLights(Color.BLUE, 3000, 100)
 				.setContentIntent(getPendingIntent(INIT))
-				.setOngoing(true)
-				.setSmallIcon(R.mipmap.ic_launcher);
+				.setOngoing(true);
 
 		Notification notification = builder.build();
-		notification.defaults = Notification.DEFAULT_LIGHTS;
-		notification.defaults = Notification.DEFAULT_VIBRATE;
-		notification.defaults = Notification.DEFAULT_SOUND;
-		notification.flags = Notification.FLAG_ONGOING_EVENT;
+//		notification.defaults |= Notification.DEFAULT_LIGHTS;
+//		notification.defaults = Notification.DEFAULT_VIBRATE;
+//		notification.defaults = Notification.DEFAULT_SOUND;
+//		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 
 		notificationManager.notify(NOTIFY_ID, notification);
 	}
@@ -249,7 +249,9 @@ public class DownloadManager implements Runnable {
 	@Override
 	public void run() {
 		Logd(TAG, "run: ");
-		sendNotification();
+		if (mDownloadStatus != RESUMED && mDownloadStatus != DOWNLOADING) {
+			sendNotification();
+		}
 		downloadApk();
 	}
 
@@ -283,7 +285,12 @@ public class DownloadManager implements Runnable {
 					writeApk(response, apkFile, contentLen, startLen);
 				} catch (IOException e) {
 					e.printStackTrace();
-					sendFailureMsg(e);
+					Loge(TAG, "downloadApk: e");
+					if (e instanceof InterruptedIOException) {
+						onPause();
+					} else {
+						sendFailureMsg(e);
+					}
 				}
 			}
 		}
@@ -370,7 +377,12 @@ public class DownloadManager implements Runnable {
 			sendCompleteMsg(apkFile.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
-			sendFailureMsg(e);
+			Loge(TAG, "writeApk: e");
+			if (e instanceof InterruptedIOException) {
+				onPause();
+			} else {
+				sendFailureMsg(e);
+			}
 		} finally {
 			try {
 				if (inputStream != null) {
@@ -450,9 +462,10 @@ public class DownloadManager implements Runnable {
 	 * 下载暂停处理
 	 */
 	private void onPause() {
-		Notification notification = builder.build();
+		Loge(TAG, "onPause: ");
 		builder.setContentText("暂停中");
 		builder.setContentIntent(getPendingIntent(PAUSED));
+		Notification notification = builder.build();
 		notificationManager.notify(NOTIFY_ID, notification);
 	}
 
@@ -460,9 +473,10 @@ public class DownloadManager implements Runnable {
 	 * 下载失败处理
 	 */
 	private void onFailure() {
-		Notification notification = builder.build();
+		Loge(TAG, "onFailure: ");
 		builder.setContentText("下载失败");
 		builder.setContentIntent(getPendingIntent(FAILED));
+		Notification notification = builder.build();
 		notificationManager.notify(NOTIFY_ID, notification);
 	}
 
@@ -470,11 +484,11 @@ public class DownloadManager implements Runnable {
 	 * 下载完成处理
 	 */
 	private void onComplete() {
-		Notification notification = builder.build();
 		builder.setContentText("下载完成");
 		builder.setProgress(100, 100, false);
 		builder.setContentInfo("100%");
 		builder.setContentIntent(getPendingIntent(COMPLETE));
+		Notification notification = builder.build();
 //                            notification.flags = Notification.FLAG_AUTO_CANCEL;
 		notificationManager.notify(NOTIFY_ID, notification);
 //		notification.contentView.setTextViewText(android.support.compat.R.id.text,"下载完成");
