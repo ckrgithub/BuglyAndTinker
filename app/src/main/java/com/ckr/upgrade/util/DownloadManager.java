@@ -287,7 +287,7 @@ public class DownloadManager implements Runnable {
 					e.printStackTrace();
 					Loge(TAG, "downloadApk: e");
 					if (e instanceof InterruptedIOException) {
-						onPause();
+						sendPauseMsg();
 					} else {
 						sendFailureMsg(e);
 					}
@@ -322,6 +322,18 @@ public class DownloadManager implements Runnable {
 			Message message = mHandler.obtainMessage();
 			message.what = FAILED;
 			message.obj = e;
+			mHandler.sendMessage(message);
+		}
+	}
+
+	/**
+	 * 发送暂停下载消息
+	 */
+	private void sendPauseMsg() {
+		Logd(TAG, "sendPauseMsg  mHandler:" + mHandler);
+		if (mHandler != null) {
+			Message message = mHandler.obtainMessage();
+			message.what = PAUSED;
 			mHandler.sendMessage(message);
 		}
 	}
@@ -379,7 +391,7 @@ public class DownloadManager implements Runnable {
 			e.printStackTrace();
 			Loge(TAG, "writeApk: e");
 			if (e instanceof InterruptedIOException) {
-				onPause();
+				sendPauseMsg();
 			} else {
 				sendFailureMsg(e);
 			}
@@ -453,6 +465,10 @@ public class DownloadManager implements Runnable {
 						}
 						ApkUtil.installApk(obj.toString());
 					}
+					break;
+				case PAUSED:
+					mDownloadStatus = PAUSED;
+					onPause();
 					break;
 			}
 		}

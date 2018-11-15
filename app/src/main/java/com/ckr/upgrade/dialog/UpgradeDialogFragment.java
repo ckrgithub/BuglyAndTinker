@@ -157,6 +157,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 				}
 				DownloadManager downloadManager = DownloadManager.with(this.getContext().getApplicationContext());
 				int downloadStatus = getDownloadStatus();
+				Logd(TAG, "onClick: downloadStatus:"+downloadStatus);
 				if (downloadStatus == COMPLETE) {
 					UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
 					if (upgradeInfo != null) {

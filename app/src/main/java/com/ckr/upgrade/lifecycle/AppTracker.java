@@ -4,16 +4,10 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.MainActivity;
 import com.ckr.upgrade.dialog.UpgradeDialogFragment;
-import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.UpgradeInfo;
-
-import java.io.File;
 
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
@@ -43,7 +37,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
                 .setPositiveText("立即更新")
                 .setNegativeText("以后再说")
-                .setOnDialogClickListener(this)
+                .setOnDialogClickListener(null)
                 .build();
         dialogFragment.show(activity);
     }
