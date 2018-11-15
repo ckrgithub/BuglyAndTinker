@@ -45,7 +45,7 @@ public class DownloadReceiver extends BroadcastReceiver {
 					DownloadManager.with(context.getApplicationContext()).resumeDownload();
 					break;
 				case FAILED:
-
+					DownloadManager.with(context.getApplicationContext()).startDownload();
 					break;
 			}
 		}
