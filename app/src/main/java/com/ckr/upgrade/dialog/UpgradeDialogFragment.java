@@ -154,7 +154,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
                 }
                 if (Beta.getUpgradeInfo().upgradeType == STRATEGY_FORCE) {
                 } else {
-//					dismiss();
+					dismiss();
                 }
                 DownloadManager downloadManager = DownloadManager.with(this.getContext().getApplicationContext());
                 int downloadStatus = getDownloadStatus();

@@ -1,6 +1,7 @@
 package com.ckr.upgrade.listener;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 
 import com.ckr.upgrade.lifecycle.AppTracker;
 import com.tencent.bugly.beta.UpgradeInfo;
@@ -17,7 +18,7 @@ public class MyUpgradeListener implements UpgradeListener, Runnable {
     private static final String TAG = "MyUpgradeListener";
     private final AppTracker appTracker;
 
-    public MyUpgradeListener(AppTracker appTracker) {
+    public MyUpgradeListener(@NonNull AppTracker appTracker) {
         this.appTracker = appTracker;
     }
 
@@ -34,6 +35,8 @@ public class MyUpgradeListener implements UpgradeListener, Runnable {
     @Override
     public void run() {
         Loge(TAG, "run: 需要更新，存在更新策略");
-        appTracker.showDialog(true);
+        if (appTracker != null) {
+            appTracker.showDialog(true);
+        }
     }
 }

@@ -525,17 +525,13 @@ public class DownloadManager implements Runnable {
     private void onComplete() {
         Logd(TAG, "onComplete: ");
         if (builder != null) {
-            builder.setContentText("下载完成");
-            builder.setProgress(100, 100, false);
-            builder.setContentInfo("100%");
-            builder.setContentIntent(getPendingIntent(COMPLETE));
-            Notification notification = builder.build();
-//                            notification.flags = Notification.FLAG_AUTO_CANCEL;
-            notificationManager.notify(NOTIFY_ID, notification);
-//		notification.contentView.setTextViewText(android.support.compat.R.id.text,"下载完成");
-//                    if (notificationManager != null) {
-//                        notificationManager.cancel(NOTIFY_ID);
-//                    }
+//            builder.setContentText("下载完成");
+//            builder.setProgress(100, 100, false);
+//            builder.setContentInfo("100%");
+//            builder.setContentIntent(getPendingIntent(COMPLETE));
+//            Notification notification = builder.build();
+//            notificationManager.notify(NOTIFY_ID, notification);
+            notificationManager.cancel(NOTIFY_ID);
         }
     }
 
