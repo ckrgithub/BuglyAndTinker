@@ -12,11 +12,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ckr.upgrade.R;
+import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.DownloadListener;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.DownloadManager;
 import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.UpgradeInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +88,10 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
         btnOK.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
+        if (upgradeInfo == null) {
+            return;
+        }
         String title = upgradeInfo.title;
         String versionName = upgradeInfo.versionName;
         String newFeature = upgradeInfo.newFeature;
@@ -152,20 +155,22 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
                     onDialogClickListener.onPositiveClick();
                     return;
                 }
-                if (Beta.getUpgradeInfo().upgradeType == STRATEGY_FORCE) {
+                UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
+                if (upgradeInfo == null) {
+                    dismiss();
+                    return;
+                }
+                if (upgradeInfo.upgradeType == STRATEGY_FORCE) {
                 } else {
-					dismiss();
+                    dismiss();
                 }
                 DownloadManager downloadManager = DownloadManager.with(this.getContext().getApplicationContext());
                 int downloadStatus = getDownloadStatus();
                 Logd(TAG, "onClick: downloadStatus:" + downloadStatus);
                 if (downloadStatus == COMPLETE) {
-                    UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
-                    if (upgradeInfo != null) {
-                        String apkUrl = upgradeInfo.apkUrl;
-                        Context context = getContext();
-                        ApkUtil.installApk(ApkUtil.getApkPath(apkUrl,context), context);
-                    }
+                    String apkUrl = upgradeInfo.apkUrl;
+                    Context context = getContext();
+                    ApkUtil.installApk(ApkUtil.getApkPath(apkUrl, context), context);
                 } else if (downloadStatus == PAUSED) {
                     downloadManager.resumeDownload();
                 } else if (downloadStatus == FAILED || downloadStatus == INIT) {
@@ -185,11 +190,11 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
      * @return
      */
     private int getDownloadStatus() {
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
+        UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
             long fileSize = upgradeInfo.fileSize;
-            String apkPath = ApkUtil.getApkPath(apkUrl,getContext());
+            String apkPath = ApkUtil.getApkPath(apkUrl, getContext());
             if (!TextUtils.isEmpty(apkPath)) {
                 File file = new File(apkPath);
                 Logd(TAG, "getDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);

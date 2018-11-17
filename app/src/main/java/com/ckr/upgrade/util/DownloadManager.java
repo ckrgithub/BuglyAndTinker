@@ -14,18 +14,19 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ckr.upgrade.R;
+import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.DownloadListener;
-import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.UpgradeInfo;
+
+import org.apache.http.conn.ConnectTimeoutException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,6 +70,7 @@ public class DownloadManager implements Runnable {
     private Future<?> mFuture;
     private boolean isAutoInstall = true;//是否自动安装
     private boolean enableNotification = true;//是否发送通知
+    private UpgradeInfo upgradeInfo = null;
 
     private DownloadManager(Context context) {
         mContext = context;
@@ -103,6 +105,14 @@ public class DownloadManager implements Runnable {
 
     public boolean isEnableNotification() {
         return enableNotification;
+    }
+
+    public UpgradeInfo getUpgradeInfo() {
+        return upgradeInfo;
+    }
+
+    public void setUpgradeInfo(UpgradeInfo upgradeInfo) {
+        this.upgradeInfo = upgradeInfo;
     }
 
     /**
@@ -164,7 +174,6 @@ public class DownloadManager implements Runnable {
      */
     public void pauseDownload() {
         Logd(TAG, "pauseDownload: ");
-        mDownloadStatus = PAUSED;
         if (mFuture != null) {
             boolean isPause = mFuture.cancel(true);
             mFuture = null;
@@ -176,7 +185,10 @@ public class DownloadManager implements Runnable {
      * 继续下载
      */
     public void resumeDownload() {
-        Logd(TAG, "resumeDownload: ");
+        Logd(TAG, "resumeDownload: mDownloadStatus:" + mDownloadStatus);
+        if (mDownloadStatus != PAUSED) {
+            return;
+        }
         mDownloadStatus = RESUMED;
         submit();
     }
@@ -185,6 +197,9 @@ public class DownloadManager implements Runnable {
      * 开始下载
      */
     public void startDownload() {
+        if (upgradeInfo == null) {
+            throw new NullPointerException("upgradeInfo is null");
+        }
         Logd(TAG, "startDownload: mDownloadStatus:" + mDownloadStatus);
         if (mDownloadStatus == DownloadManager.DOWNLOADING) {
             return;
@@ -240,10 +255,9 @@ public class DownloadManager implements Runnable {
         Intent intent = new Intent();
         intent.setAction(APK_DOWNLOAD_RECEIVER);
         intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
-            intent.putExtra(APK_URL, ApkUtil.getApkPath(apkUrl,mContext));
+            intent.putExtra(APK_URL, ApkUtil.getApkPath(apkUrl, mContext));
         }
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent;
@@ -279,13 +293,12 @@ public class DownloadManager implements Runnable {
      */
     private void downloadApk() {
         Logd(TAG, "downloadApk: ");
-        UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
             String apkName = ApkUtil.getApkName(apkUrl);
             Logd(TAG, "downloadApk: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
-                final String path = ApkUtil.getApkPath(apkUrl,mContext);
+                final String path = ApkUtil.getApkPath(apkUrl, mContext);
                 final File apkFile = new File(path);
                 long startLen = apkFile.length();
                 long contentLen = upgradeInfo.fileSize;
@@ -306,7 +319,13 @@ public class DownloadManager implements Runnable {
                     e.printStackTrace();
                     Loge(TAG, "downloadApk: e");
                     if (e instanceof InterruptedIOException) {
-                        sendPauseMsg();
+                        if (e instanceof SocketTimeoutException) {
+                            sendFailureMsg(e);
+                        } else if (e instanceof ConnectTimeoutException) {
+                            sendFailureMsg(e);
+                        } else {
+                            sendPauseMsg();
+                        }
                     } else {
                         sendFailureMsg(e);
                     }
@@ -483,7 +502,7 @@ public class DownloadManager implements Runnable {
                             }
                         }
                         if (isAutoInstall) {
-                            ApkUtil.installApk(obj.toString(),mContext);
+                            ApkUtil.installApk(obj.toString(), mContext);
                         }
                     }
                     break;

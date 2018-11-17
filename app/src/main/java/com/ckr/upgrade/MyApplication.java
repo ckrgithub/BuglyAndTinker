@@ -105,7 +105,7 @@ public class MyApplication extends DefaultApplicationLike {
 		Beta.enableHotfix = true;//设置开启热更新
 //      </editor-fold>
 
-		Beta.upgradeListener = new MyUpgradeListener(appTracker);//app更新策略监听
+		Beta.upgradeListener = new MyUpgradeListener(appTracker,getApplication().getApplicationContext());//app更新策略监听
 		//初始化统一接口
 		Bugly.init(context, BUGLY_ID, BuildConfig.IS_DEBUG, strategy);
 		Loge(TAG, "initBugly: usedTime:" + (System.currentTimeMillis() - startTime));
