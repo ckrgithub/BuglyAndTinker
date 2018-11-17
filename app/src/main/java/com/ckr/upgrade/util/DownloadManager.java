@@ -55,8 +55,7 @@ public class DownloadManager implements Runnable {
     public final static int DOWNLOADING = 2;
     public final static int PAUSED = 3;
     public final static int RESUMED = 4;
-    public final static int DELETED = 5;
-    public final static int FAILED = 6;
+    public final static int FAILED = 5;
     private final static int NOTIFY_ID = 1129;
 
     private static DownloadManager INSTANCE;
@@ -68,8 +67,8 @@ public class DownloadManager implements Runnable {
     private NotificationCompat.Builder builder;
     private ExecutorService mExecutor;
     private Future<?> mFuture;
-    private boolean isAutoInstall = true;
-    private boolean enableNotification = true;
+    private boolean isAutoInstall = true;//是否自动安装
+    private boolean enableNotification = true;//是否发送通知
 
     private DownloadManager(Context context) {
         mContext = context;
@@ -244,7 +243,7 @@ public class DownloadManager implements Runnable {
         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
-            intent.putExtra(APK_URL, ApkUtil.getApkPath(apkUrl));
+            intent.putExtra(APK_URL, ApkUtil.getApkPath(apkUrl,mContext));
         }
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent;
@@ -286,7 +285,7 @@ public class DownloadManager implements Runnable {
             String apkName = ApkUtil.getApkName(apkUrl);
             Logd(TAG, "downloadApk: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
-                final String path = ApkUtil.getApkPath(apkUrl);
+                final String path = ApkUtil.getApkPath(apkUrl,mContext);
                 final File apkFile = new File(path);
                 long startLen = apkFile.length();
                 long contentLen = upgradeInfo.fileSize;
@@ -484,7 +483,7 @@ public class DownloadManager implements Runnable {
                             }
                         }
                         if (isAutoInstall) {
-                            ApkUtil.installApk(obj.toString());
+                            ApkUtil.installApk(obj.toString(),mContext);
                         }
                     }
                     break;

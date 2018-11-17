@@ -1,6 +1,7 @@
 package com.ckr.upgrade.dialog;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -162,7 +163,8 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
                     UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
                     if (upgradeInfo != null) {
                         String apkUrl = upgradeInfo.apkUrl;
-                        ApkUtil.installApk(ApkUtil.getApkPath(apkUrl));
+                        Context context = getContext();
+                        ApkUtil.installApk(ApkUtil.getApkPath(apkUrl,context), context);
                     }
                 } else if (downloadStatus == PAUSED) {
                     downloadManager.resumeDownload();
@@ -187,7 +189,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
         if (upgradeInfo != null) {
             String apkUrl = upgradeInfo.apkUrl;
             long fileSize = upgradeInfo.fileSize;
-            String apkPath = ApkUtil.getApkPath(apkUrl);
+            String apkPath = ApkUtil.getApkPath(apkUrl,getContext());
             if (!TextUtils.isEmpty(apkPath)) {
                 File file = new File(apkPath);
                 Logd(TAG, "getDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);
