@@ -39,7 +39,7 @@ public class DownloadReceiver extends BroadcastReceiver {
 					DownloadManager.with(context.getApplicationContext()).pauseDownload();
 					break;
 				case COMPLETE:
-					ApkUtil.installApk(url,context);
+					ApkUtil.installApk(url, context);
 					break;
 				case PAUSED:
 					DownloadManager.with(context.getApplicationContext()).resumeDownload();
