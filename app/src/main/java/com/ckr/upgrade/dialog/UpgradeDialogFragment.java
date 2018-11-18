@@ -5,9 +5,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ckr.upgrade.R;
@@ -117,18 +119,25 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 		if (bundle != null) {
 			cancelableType = bundle.getInt(TYPE_CANCELABLE, DEFAULT);
 		}
-//		if (upgradeType == STRATEGY_FORCE) {
-//			setCancelableType(NO_CANCELED);
-//			btnCancel.setVisibility(View.GONE);
-//			verticalLine.setVisibility(View.GONE);
-//			ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) btnOK.getLayoutParams();
-//			layoutParams.leftToLeft = R.id.constraintLayout;
-//			btnOK.setLayoutParams(layoutParams);
-//			btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
-//		} else {
-//			setCancelableType(cancelableType);
-//		}
+		if (upgradeType == STRATEGY_FORCE) {
+			setCancelableType(NO_CANCELED);
+			forceStrategyLayout(btnCancel, verticalLine);
+		} else {
+			setCancelableType(cancelableType);
+		}
 		updateBtn(getText());
+	}
+
+	protected void forceStrategyLayout(TextView btnCancel, View verticalLine) {
+		btnCancel.setVisibility(View.GONE);
+		verticalLine.setVisibility(View.GONE);
+		ViewGroup.LayoutParams params = btnOK.getLayoutParams();
+		if (params instanceof ConstraintLayout.LayoutParams) {
+			ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) params;
+			layoutParams.leftToLeft = R.id.constraintLayout;
+			btnOK.setLayoutParams(layoutParams);
+		}
+		btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
 	}
 
 	private String getText() {
@@ -156,10 +165,6 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 		super.onClick(v);
 		switch (v.getId()) {
 			case R.id.btnOK:
-				if (onDialogClickListener != null) {
-					onDialogClickListener.onPositiveClick();
-					return;
-				}
 				UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
 				if (upgradeInfo == null) {
 					dismiss();
@@ -180,7 +185,11 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 					downloadManager.resumeDownload();
 				} else if (downloadStatus == FAILED || downloadStatus == INIT) {
 					updateBtn(getString(R.string.upgrade_status_download));
-					downloadManager.startDownload();
+					if (onDialogClickListener != null) {
+						onDialogClickListener.onPositiveClick();
+					} else {
+						downloadManager.startDownload();
+					}
 				}
 				break;
 			case R.id.btnCancel:

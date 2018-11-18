@@ -16,50 +16,52 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
  * @author ckr
  */
 public class DownLoadService extends Service {
-    private static final String TAG = "DownLoadService";
-    private DownLoadBinder binder;
-    private DownloadManager downloadManager;
+	private static final String TAG = "DownLoadService";
+	private DownLoadBinder binder;
+	private DownloadManager downloadManager;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Logd(TAG, "onCreate: " + this);
-        downloadManager = DownloadManager.with(this.getApplicationContext());
-    }
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Logd(TAG, "onCreate: " + this);
+		downloadManager = DownloadManager.with(this.getApplicationContext());
+	}
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Logd(TAG, "onStartCommand: flags:" + flags + ",startId:" + startId + ",this:" + this);
-        downloadManager.startDownload();
-        return super.onStartCommand(intent, flags, startId);
-    }
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Logd(TAG, "onStartCommand: flags:" + flags + ",startId:" + startId + ",this:" + this);
+		if (downloadManager.getUpgradeInfo() != null) {
+			downloadManager.startDownload();
+		}
+		return super.onStartCommand(intent, flags, startId);
+	}
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        Logd(TAG, "onBind");
-        return binder = new DownLoadBinder();
-    }
+	@Nullable
+	@Override
+	public IBinder onBind(Intent intent) {
+		Logd(TAG, "onBind");
+		return binder = new DownLoadBinder();
+	}
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Logd(TAG, "onUnbind: ");
-        return super.onUnbind(intent);
-    }
+	@Override
+	public boolean onUnbind(Intent intent) {
+		Logd(TAG, "onUnbind: ");
+		return super.onUnbind(intent);
+	}
 
-    @Override
-    public void onRebind(Intent intent) {
-        super.onRebind(intent);
-        Logd(TAG, "onRebind: ");
-    }
+	@Override
+	public void onRebind(Intent intent) {
+		super.onRebind(intent);
+		Logd(TAG, "onRebind: ");
+	}
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Logd(TAG, "onDestroy: ");
-    }
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Logd(TAG, "onDestroy: ");
+	}
 
-    public class DownLoadBinder extends Binder {
-    }
+	public class DownLoadBinder extends Binder {
+	}
 
 }

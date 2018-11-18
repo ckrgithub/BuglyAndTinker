@@ -35,7 +35,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
         }
         canShow = false;
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
-                .setOnDialogClickListener(null)
+                .setOnDialogClickListener(this)
                 .build();
         dialogFragment.show(activity);
     }
