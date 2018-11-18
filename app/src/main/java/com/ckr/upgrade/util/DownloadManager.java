@@ -50,8 +50,6 @@ public class DownloadManager implements Runnable {
 	private static final String TAG = "DownloadManager";
 	public static final String DOWNLOAD_PROGRESS = "download_progress";
 	public static final String APK_URL = "apk_url";
-	private static final String CHANNEL_ID = "ckrgithub";
-	private static final String CHANNEL_NAME = "upgrade";
 	public final static int INIT = 0;
 	public final static int COMPLETE = 1;
 	public final static int DOWNLOADING = 2;
@@ -72,7 +70,7 @@ public class DownloadManager implements Runnable {
 	private boolean isAutoInstall = true;//是否自动安装
 	private boolean enableNotification = true;//是否发送通知
 	private UpgradeInfo mUpgradeInfo = null;
-	private static final int MAX_PROGRESS =100;
+	private static final int MAX_PROGRESS = 100;
 
 	private DownloadManager(Context context) {
 		mContext = context;
@@ -220,16 +218,18 @@ public class DownloadManager implements Runnable {
 	public void sendNotification() {
 		Logd(TAG, "sendNotification: ");
 		mNotificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+		String channelId = getString(R.string.notification_channel_id);
 		// 8.0适配
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			final NotificationChannel channel = new NotificationChannel(
-					CHANNEL_ID,
-					CHANNEL_NAME,
+					channelId,
+					getString(R.string.notification_channel_name),
 					NotificationManager.IMPORTANCE_HIGH);
+			channel.setDescription(getString(R.string.notification_channel_description));
 			mNotificationManager.createNotificationChannel(channel);
 		}
 		// 设置参数
-		mBuilder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
+		mBuilder = new NotificationCompat.Builder(mContext, channelId);
 		String string = getString(R.string.notification_content_title);
 		mBuilder.setSmallIcon(R.mipmap.ic_launcher)//设置小图标
 				.setContentTitle(string)//设置通知标题
@@ -240,7 +240,7 @@ public class DownloadManager implements Runnable {
 				.setAutoCancel(false)//点击通知后是否自动清除
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
 				.setDefaults(Notification.DEFAULT_LIGHTS)
-				.setLights(ContextCompat.getColor(mContext,R.color.notification_light_color),
+				.setLights(ContextCompat.getColor(mContext, R.color.notification_light_color),
 						mContext.getResources().getInteger(R.integer.time_light_on),
 						mContext.getResources().getInteger(R.integer.time_light_off))
 				.setContentIntent(getPendingIntent(INIT))

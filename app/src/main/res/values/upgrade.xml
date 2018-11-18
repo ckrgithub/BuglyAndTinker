@@ -12,6 +12,9 @@
     <string name="download_status_failed">下载失败</string>
     <string name="download_status_downloading">下载中</string>
 
+    <string name="notification_channel_id">app_upgrade</string>
+    <string name="notification_channel_name">升级</string>
+    <string name="notification_channel_description">这是App升级发送的通知</string>
     <string name="notification_status_pause">暂停中</string>
     <string name="notification_content_title">@string/app_name</string>
     <string name="notification_ticker">更新中</string>
