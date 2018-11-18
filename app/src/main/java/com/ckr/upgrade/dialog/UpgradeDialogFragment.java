@@ -145,16 +145,16 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 		String positive = null;
 		switch (mDownloadStatus) {
 			case INIT:
-				positive = getString(R.string.upgrade_status_init);
+				positive = getString(R.string.download_status_init);
 				break;
 			case COMPLETE:
-				positive = getString(R.string.upgrade_status_complete);
+				positive = getString(R.string.download_status_complete);
 				break;
 			case PAUSED:
-				positive = getString(R.string.upgrade_status_pause);
+				positive = getString(R.string.download_status_pause);
 				break;
 			case FAILED:
-				positive = getString(R.string.upgrade_status_failed);
+				positive = getString(R.string.download_status_failed);
 				break;
 		}
 		return positive;
@@ -184,7 +184,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 				} else if (downloadStatus == PAUSED) {
 					downloadManager.resumeDownload();
 				} else if (downloadStatus == FAILED || downloadStatus == INIT) {
-					updateBtn(getString(R.string.upgrade_status_download));
+					updateBtn(getString(R.string.download_status_downloading));
 					if (onDialogClickListener != null) {
 						onDialogClickListener.onPositiveClick();
 					} else {
@@ -235,17 +235,17 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 
 	@Override
 	public void onCompleted(String path) {
-		updateBtn(getString(R.string.upgrade_status_complete));
+		updateBtn(getString(R.string.download_status_complete));
 	}
 
 	@Override
 	public void onFailed(IOException e) {
-		updateBtn(getString(R.string.upgrade_status_failed));
+		updateBtn(getString(R.string.download_status_failed));
 	}
 
 	@Override
 	public void onPaused() {
-		updateBtn(getString(R.string.upgrade_status_pause));
+		updateBtn(getString(R.string.download_status_pause));
 	}
 
 	private void updateBtn(String text) {

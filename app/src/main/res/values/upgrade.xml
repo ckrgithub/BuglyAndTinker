@@ -6,11 +6,20 @@
     <string name="upgrade_apk_size">包大小：%sM</string>
     <string name="upgrade_progress_symbol">%</string>
 
-    <string name="upgrade_status_init">立即更新</string>
-    <string name="upgrade_status_complete">立即安装</string>
-    <string name="upgrade_status_pause">继续下载</string>
-    <string name="upgrade_status_failed">下载失败</string>
-    <string name="upgrade_status_download">下载中</string>
+    <string name="download_status_init">立即更新</string>
+    <string name="download_status_complete">立即安装</string>
+    <string name="download_status_pause">继续下载</string>
+    <string name="download_status_failed">下载失败</string>
+    <string name="download_status_downloading">下载中</string>
+
+    <string name="notification_status_pause">暂停中</string>
+    <string name="notification_content_title">@string/app_name</string>
+    <string name="notification_ticker">更新中</string>
+    
+    
+    <integer name="time_light_on">1500</integer>
+    <integer name="time_light_off">150</integer>
+
 
     <dimen name="dialog_margin_left">30dp</dimen>
     <dimen name="dialog_margin_right">30dp</dimen>
@@ -35,6 +44,7 @@
     <color name="dialog_vertical_line_background">#ccc</color>
     <color name="dialog_btn_negative">#0076ff</color>
     <color name="dialog_btn_positive">#0076ff</color>
+    <color name="notification_light_color">#fff</color>
 
 
     <style name="Base_Dialog_Style" parent="@android:style/Theme.Dialog">
