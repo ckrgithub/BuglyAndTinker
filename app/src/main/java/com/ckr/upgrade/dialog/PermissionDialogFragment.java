@@ -73,8 +73,8 @@ public class PermissionDialogFragment extends BaseDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        TextView btnCancel = view.findViewById(R.id.btnCancel);
-        btnOK = view.findViewById(R.id.btnOK);
+        TextView btnCancel = view.findViewById(R.id.btnNegative);
+        btnOK = view.findViewById(R.id.btnPositive);
         TextView titleView = view.findViewById(R.id.titleView);
         TextView msgView = view.findViewById(R.id.msgView);
         btnOK.setOnClickListener(this);
@@ -124,9 +124,9 @@ public class PermissionDialogFragment extends BaseDialogFragment {
     public void onClick(View v) {
         super.onClick(v);
         switch (v.getId()) {
-            case R.id.btnOK:
+            case R.id.btnPositive:
                 break;
-            case R.id.btnCancel:
+            case R.id.btnNegative:
                 dismiss();
                 break;
         }

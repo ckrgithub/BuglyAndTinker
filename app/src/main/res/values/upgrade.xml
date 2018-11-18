@@ -26,15 +26,16 @@
     <dimen name="dialog_padding_left">16dp</dimen>
     <dimen name="dialog_padding_right">16dp</dimen>
     <dimen name="dialog_title_margin_top">10dp</dimen>
-    <dimen name="dialog_msg_margin_top">5dp</dimen>
+    <dimen name="dialog_msg_margin_top">10dp</dimen>
     <dimen name="dialog_horizontal_line_height">1dp</dimen>
-    <dimen name="dialog_horizontal_line_margin_top">10dp</dimen>
+    <dimen name="dialog_horizontal_line_margin_top">16dp</dimen>
     <dimen name="dialog_vertical_line_width">0.5dp</dimen>
     <dimen name="dialog_btn_height">45dp</dimen>
+    <dimen name="dialog_background_radius">12dp</dimen>
 
 
     <dimen name="dialog_title_text_size">18sp</dimen>
-    <dimen name="dialog_msg_text_size">14sp</dimen>
+    <dimen name="dialog_msg_text_size">16sp</dimen>
     <dimen name="dialog_btn_text_size">18sp</dimen>
 
 
@@ -45,6 +46,9 @@
     <color name="dialog_btn_negative">#0076ff</color>
     <color name="dialog_btn_positive">#0076ff</color>
     <color name="notification_light_color">#fff</color>
+    <color name="dialog_background_color">#fff</color>
+    <color name="dialog_btn_press_color">#e1e1e1</color>
+    <color name="dialog_btn_normal_color">@android:color/transparent</color>
 
 
     <style name="Base_Dialog_Style" parent="@android:style/Theme.Dialog">

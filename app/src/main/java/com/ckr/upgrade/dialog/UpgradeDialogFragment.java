@@ -20,7 +20,6 @@ import com.ckr.upgrade.util.DownloadManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static com.ckr.upgrade.util.DownloadManager.COMPLETE;
 import static com.ckr.upgrade.util.DownloadManager.FAILED;
@@ -35,18 +34,17 @@ import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 public class UpgradeDialogFragment extends BaseDialogFragment implements DownloadListener {
 	private static final String TAG = "BaseDialogFragment";
-	private static final long MB = 1024 * 1024;
-	private static final int SCALE_VALUE = 2;
-
-	private static final String TYPE_CANCELABLE = "cancelableType";
+	protected static final long MB = 1024 * 1024;
+	protected static final int SCALE_VALUE = 2;
+	protected static final String TYPE_CANCELABLE = "cancelableType";
 	// 建议升级
-	private static final int STRATEGY_OPTIONAL = 1;
+	protected static final int STRATEGY_OPTIONAL = 1;
 	// 强制升级
-	private static final int STRATEGY_FORCE = 2;
+	protected static final int STRATEGY_FORCE = 2;
 	// 手工升级
-	private static final int STRATEGY_MANUAL = 3;
+	protected static final int STRATEGY_MANUAL = 3;
 
-	private TextView btnOK;
+	private TextView btnPositive;
 	private static OnDialogClickListener onDialogClickListener;
 
 	public static UpgradeDialogFragment newInstance(@CancelableType int cancelableType, OnDialogClickListener onDialogClickListener) {
@@ -84,35 +82,24 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		TextView btnCancel = view.findViewById(R.id.btnCancel);
-		btnOK = view.findViewById(R.id.btnOK);
+		TextView btnNegative = view.findViewById(R.id.btnNegative);
+		btnPositive = view.findViewById(R.id.btnPositive);
 		View verticalLine = view.findViewById(R.id.verticalLine);
 		TextView titleView = view.findViewById(R.id.titleView);
 		TextView msgView = view.findViewById(R.id.msgView);
-		TextView versionView = view.findViewById(R.id.versionView);
-		TextView sizeView = view.findViewById(R.id.sizeView);
-		btnOK.setOnClickListener(this);
-		btnCancel.setOnClickListener(this);
+		btnPositive.setOnClickListener(this);
+		btnNegative.setOnClickListener(this);
 
 		UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
 		if (upgradeInfo == null) {
 			return;
 		}
 		String title = upgradeInfo.title;
-		String versionName = upgradeInfo.versionName;
 		String newFeature = upgradeInfo.newFeature;
 		int upgradeType = upgradeInfo.upgradeType;
-		double fileSize = upgradeInfo.fileSize / (double) MB;
-		Logd(TAG, "onViewCreated: fileSize:" + upgradeInfo.fileSize);
-		BigDecimal decimal = new BigDecimal(fileSize);
-		String size = decimal.setScale(SCALE_VALUE, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros().toPlainString();
 
 		titleView.setText(title);
 		msgView.setText(newFeature);
-		versionView.setText(getString(R.string.upgrade_version_info) + versionName);
-		sizeView.setText(String.format(getString(R.string.upgrade_apk_size), size));
-		versionView.setVisibility(View.GONE);
-		sizeView.setVisibility(View.INVISIBLE);
 
 		int cancelableType = DEFAULT;
 		Bundle bundle = getArguments();
@@ -121,23 +108,23 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 		}
 		if (upgradeType == STRATEGY_FORCE) {
 			setCancelableType(NO_CANCELED);
-			forceStrategyLayout(btnCancel, verticalLine);
+			forceStrategyLayout(btnNegative, verticalLine);
 		} else {
 			setCancelableType(cancelableType);
 		}
 		updateBtn(getText());
 	}
 
-	protected void forceStrategyLayout(TextView btnCancel, View verticalLine) {
-		btnCancel.setVisibility(View.GONE);
+	protected void forceStrategyLayout(TextView btnNegative, View verticalLine) {
+		btnNegative.setVisibility(View.GONE);
 		verticalLine.setVisibility(View.GONE);
-		ViewGroup.LayoutParams params = btnOK.getLayoutParams();
+		ViewGroup.LayoutParams params = btnPositive.getLayoutParams();
 		if (params instanceof ConstraintLayout.LayoutParams) {
 			ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) params;
 			layoutParams.leftToLeft = R.id.constraintLayout;
-			btnOK.setLayoutParams(layoutParams);
+			btnPositive.setLayoutParams(layoutParams);
 		}
-		btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
+		btnPositive.setBackgroundResource(R.drawable.selector_dialog_positive_button2);
 	}
 
 	private String getText() {
@@ -164,7 +151,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 	public void onClick(View v) {
 		super.onClick(v);
 		switch (v.getId()) {
-			case R.id.btnOK:
+			case R.id.btnPositive:
 				UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
 				if (upgradeInfo == null) {
 					dismiss();
@@ -192,7 +179,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 					}
 				}
 				break;
-			case R.id.btnCancel:
+			case R.id.btnNegative:
 				dismiss();
 				break;
 		}
@@ -249,8 +236,8 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 	}
 
 	private void updateBtn(String text) {
-		if (btnOK != null) {
-			btnOK.setText(text);
+		if (btnPositive != null) {
+			btnPositive.setText(text);
 		}
 	}
 

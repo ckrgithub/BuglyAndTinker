@@ -9,7 +9,7 @@
     android:layout_gravity="center"
     android:layout_marginLeft="30dp"
     android:layout_marginRight="30dp"
-    android:background="@drawable/bg_white_and_radius">
+    android:background="@drawable/bg_upgrade_dialog">
 
     <TextView
         android:id="@+id/titleView"
@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@+id/horizontalLine"/>
 
     <TextView
-        android:id="@+id/btnCancel"
+        android:id="@+id/btnNegative"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:background="@drawable/selector_dialog_negative_button"
@@ -75,7 +75,7 @@
 
 
     <TextView
-        android:id="@+id/btnOK"
+        android:id="@+id/btnPositive"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:background="@drawable/selector_dialog_positive_button"
