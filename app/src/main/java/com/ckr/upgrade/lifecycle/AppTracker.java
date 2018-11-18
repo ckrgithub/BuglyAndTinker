@@ -35,8 +35,6 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
         }
         canShow = false;
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
-                .setPositiveText("立即更新")
-                .setNegativeText("以后再说")
                 .setOnDialogClickListener(null)
                 .build();
         dialogFragment.show(activity);

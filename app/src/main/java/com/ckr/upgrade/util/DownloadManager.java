@@ -423,7 +423,6 @@ public class DownloadManager implements Runnable {
                 }
             }
             outputStream.flush();
-            onComplete();
             sendCompleteMsg(apkFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
@@ -492,6 +491,7 @@ public class DownloadManager implements Runnable {
                 case COMPLETE:
                     Logd(TAG, "handleMessage: COMPLETE");
                     mDownloadStatus = COMPLETE;
+                    onComplete();
                     obj = msg.obj;
                     if (obj != null) {
                         if (mListeners != null) {
@@ -509,6 +509,13 @@ public class DownloadManager implements Runnable {
                 case PAUSED:
                     mDownloadStatus = PAUSED;
                     onPause();
+                    if (mListeners != null) {
+                        for (DownloadListener mListener : mListeners) {
+                            if (mListener != null) {
+                                mListener.onPaused();
+                            }
+                        }
+                    }
                     break;
             }
         }

@@ -13,4 +13,6 @@ public interface DownloadListener {
     void onCompleted(String path);
 
     void onFailed(IOException e);
+
+    void onPaused();
 }

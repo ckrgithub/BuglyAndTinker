@@ -43,7 +43,7 @@
 
     <View
         android:id="@+id/horizontalLine"
-        style="@style/framework_horizontal_line"
+        style="@style/upgrade_horizontal_line"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
         android:background="#ccc"
@@ -51,7 +51,7 @@
 
     <View
         android:id="@+id/verticalLine"
-        style="@style/framework_vertical_line"
+        style="@style/upgrade_vertical_line"
         android:layout_width="1dp"
         android:layout_height="45dp"
         android:background="#ccc"
