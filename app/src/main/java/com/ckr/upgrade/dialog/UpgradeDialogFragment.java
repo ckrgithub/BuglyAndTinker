@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -26,6 +25,7 @@ import static com.ckr.upgrade.util.DownloadManager.FAILED;
 import static com.ckr.upgrade.util.DownloadManager.INIT;
 import static com.ckr.upgrade.util.DownloadManager.PAUSED;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
+import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 /**
  * Created by ckr on 2018/11/11.
@@ -58,7 +58,14 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 
 	public void show(@NonNull Activity activity) {
 		if (activity instanceof FragmentActivity) {
-			show(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
+			//当手机屏幕锁屏后，收到升级通知显示dialog时会报错:
+			//java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+			try {
+				show(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				Loge(TAG, "show: e:" + e.getMessage());
+			}
 		}
 	}
 
@@ -105,22 +112,22 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
 		versionView.setVisibility(View.GONE);
 		sizeView.setVisibility(View.INVISIBLE);
 
-		int cancelableType=DEFAULT;
+		int cancelableType = DEFAULT;
 		Bundle bundle = getArguments();
 		if (bundle != null) {
 			cancelableType = bundle.getInt(TYPE_CANCELABLE, DEFAULT);
 		}
-		if (upgradeType == STRATEGY_FORCE) {
-			setCancelableType(NO_CANCELED);
-			btnCancel.setVisibility(View.GONE);
-			verticalLine.setVisibility(View.GONE);
-			ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) btnOK.getLayoutParams();
-			layoutParams.leftToLeft = R.id.constraintLayout;
-			btnOK.setLayoutParams(layoutParams);
-			btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
-		} else {
-			setCancelableType(cancelableType);
-		}
+//		if (upgradeType == STRATEGY_FORCE) {
+//			setCancelableType(NO_CANCELED);
+//			btnCancel.setVisibility(View.GONE);
+//			verticalLine.setVisibility(View.GONE);
+//			ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) btnOK.getLayoutParams();
+//			layoutParams.leftToLeft = R.id.constraintLayout;
+//			btnOK.setLayoutParams(layoutParams);
+//			btnOK.setBackgroundResource(R.drawable.selector_dialog_upgrade_button);
+//		} else {
+//			setCancelableType(cancelableType);
+//		}
 		updateBtn(getText());
 	}
 

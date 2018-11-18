@@ -22,10 +22,10 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        Logd(TAG, "onActivityCreated: " + activity);
     }
 
     public void showDialog(boolean isShow) {
+        Logd(TAG, "showDialog: isShow:"+isShow+",activity:"+activity);
         canShow = isShow;
         if (!canShow) {
             return;
@@ -48,6 +48,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
     @Override
     public void onActivityResumed(Activity activity) {
         if (activity instanceof MainActivity) {
+            Logd(TAG, "onActivityResumed: ");
             this.activity = activity;
             showDialog(canShow);
         }
@@ -55,6 +56,10 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
 
     @Override
     public void onActivityPaused(Activity activity) {
+        if (activity instanceof MainActivity) {
+            Logd(TAG, "onActivityPaused: ");
+            this.activity = null;
+        }
     }
 
     @Override
