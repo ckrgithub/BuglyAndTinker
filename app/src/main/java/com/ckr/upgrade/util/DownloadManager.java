@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.DownloadListener;
+import com.ckr.walle.ChannelUtil;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
@@ -413,6 +414,7 @@ public class DownloadManager implements Runnable {
 		long downloadLen = startLen;
 		InputStream inputStream = null;
 		FileOutputStream outputStream = null;
+		boolean isComplete=false;
 		try {
 			inputStream = response.body().byteStream();
 			outputStream = new FileOutputStream(apkFile, true);
@@ -429,7 +431,7 @@ public class DownloadManager implements Runnable {
 				}
 			}
 			outputStream.flush();
-			sendCompleteMsg(apkFile.getAbsolutePath());
+			isComplete=true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			Loge(TAG, "writeApk: e");
@@ -449,6 +451,10 @@ public class DownloadManager implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		if (isComplete) {
+			ChannelUtil.setChannelInfo(apkFile, ChannelUtil.getChannelInfo(mContext), true);
+			sendCompleteMsg(apkFile.getAbsolutePath());
 		}
 	}
 
