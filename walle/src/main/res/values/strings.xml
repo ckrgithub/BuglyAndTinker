@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">walle</string>
+    <string name="upgrade_default_channel">ckrgithub</string>
 </resources>
