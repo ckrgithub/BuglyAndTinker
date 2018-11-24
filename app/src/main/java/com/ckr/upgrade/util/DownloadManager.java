@@ -70,6 +70,7 @@ public class DownloadManager implements Runnable {
 	private Future<?> mFuture;
 	private boolean isAutoInstall = true;//是否自动安装
 	private boolean enableNotification = true;//是否发送通知
+	private boolean enableWriteChannelInfo = true;//是否写入渠道
 	private UpgradeInfo mUpgradeInfo = null;
 	private static final int MAX_PROGRESS = 100;
 
@@ -100,12 +101,20 @@ public class DownloadManager implements Runnable {
 		this.enableNotification = enableNotification;
 	}
 
+	public void setEnableWriteChannelInfo(boolean enableWriteChannelInfo) {
+		this.enableWriteChannelInfo = enableWriteChannelInfo;
+	}
+
 	public boolean isAutoInstall() {
 		return isAutoInstall;
 	}
 
 	public boolean isEnableNotification() {
 		return enableNotification;
+	}
+
+	public boolean isEnableWriteChannelInfo() {
+		return enableWriteChannelInfo;
 	}
 
 	public UpgradeInfo getUpgradeInfo() {
@@ -414,7 +423,7 @@ public class DownloadManager implements Runnable {
 		long downloadLen = startLen;
 		InputStream inputStream = null;
 		FileOutputStream outputStream = null;
-		boolean isComplete=false;
+		boolean isComplete = false;
 		try {
 			inputStream = response.body().byteStream();
 			outputStream = new FileOutputStream(apkFile, true);
@@ -431,7 +440,7 @@ public class DownloadManager implements Runnable {
 				}
 			}
 			outputStream.flush();
-			isComplete=true;
+			isComplete = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			Loge(TAG, "writeApk: e");
@@ -453,7 +462,9 @@ public class DownloadManager implements Runnable {
 			}
 		}
 		if (isComplete) {
-			ChannelUtil.setChannelInfo(apkFile, ChannelUtil.getChannelInfo(mContext), true);
+			if (enableWriteChannelInfo) {
+				ChannelUtil.setChannelInfo(apkFile, ChannelUtil.getChannelInfo(mContext), true);
+			}
 			sendCompleteMsg(apkFile.getAbsolutePath());
 		}
 	}
