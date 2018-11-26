@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.ckr.upgrade.DownLoadService;
 import com.ckr.upgrade.MainActivity;
@@ -25,7 +26,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
     }
 
     public void showDialog(boolean isShow) {
-        Logd(TAG, "showDialog: isShow:"+isShow+",activity:"+activity);
+        Logd(TAG, "showDialog: isShow:" + isShow + ",activity:" + activity);
         canShow = isShow;
         if (!canShow) {
             return;
@@ -37,7 +38,9 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
                 .setOnDialogClickListener(this)
                 .build();
-        dialogFragment.show(activity);
+        if (activity instanceof FragmentActivity) {
+            dialogFragment.showAllowingStateLoss(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
+        }
     }
 
     @Override
