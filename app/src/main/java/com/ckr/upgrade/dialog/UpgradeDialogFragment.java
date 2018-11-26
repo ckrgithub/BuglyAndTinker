@@ -1,13 +1,10 @@
 package com.ckr.upgrade.dialog;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.View;
@@ -28,7 +25,6 @@ import static com.ckr.upgrade.util.DownloadManager.FAILED;
 import static com.ckr.upgrade.util.DownloadManager.INIT;
 import static com.ckr.upgrade.util.DownloadManager.PAUSED;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
-import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 /**
  * Created by ckr on 2018/11/11.

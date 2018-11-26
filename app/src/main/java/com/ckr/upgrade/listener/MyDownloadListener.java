@@ -46,7 +46,7 @@ public class MyDownloadListener implements DownloadListener {
 
 	@Override
 	public void onCompleted(DownloadTask downloadTask) {
-		Loge(TAG, "onCompleted: ");
+		Logd(TAG, "onCompleted: ");
 		if (mApkDownloadListener != null) {
 			mApkDownloadListener.onCompleted(downloadTask);
 		}

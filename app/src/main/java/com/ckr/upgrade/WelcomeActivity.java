@@ -59,6 +59,8 @@ public class WelcomeActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (upgradeType == TYPE_BUGLY) {
+            //isManual  用户手动点击检查，非用户点击操作请传false
+            //isSilence 是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
             Beta.checkUpgrade(false, false);
         } else if (upgradeType == TYPE_OFFICIAL) {
 

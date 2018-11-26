@@ -7,9 +7,9 @@ package com.ckr.upgrade;
 public class UpgradeInfo {
     public String id = "";//唯一标识
     public String title = "";//升级提示标题
-    public String newFeature = "";//升级特性描述
+    public String newFeature = "";//升级说明
     public long publishTime = 0;//升级发布时间,ms
-    public int publishType = 0;//升级类型 0测试 1正式
+    public int publishType = 0;//发布类型 0测试 1正式
     public int upgradeType = 1;//升级策略 1建议 2强制 3手工
     public int popTimes = 0;//提醒次数
     public long popInterval = 0;//提醒间隔
