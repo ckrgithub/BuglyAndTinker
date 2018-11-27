@@ -18,7 +18,8 @@ import android.text.TextUtils;
 
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.UpgradeInfo;
-import com.ckr.upgrade.listener.DownloadListener;
+import com.ckr.upgrade.listener.OnDownloadListener;
+import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.walle.ChannelUtil;
 
 import org.apache.http.conn.ConnectTimeoutException;
@@ -58,10 +59,11 @@ public class DownloadManager implements Runnable {
     public final static int RESUMED = 4;
     public final static int FAILED = 5;
     private final static int NOTIFY_ID = 1129;
+    private static final int MAX_PROGRESS = 100;
 
     private static DownloadManager INSTANCE;
     private final Context mContext;
-    private LinkedList<DownloadListener> mListeners;
+    private LinkedList<OnDownloadListener> mListeners;
     private int mDownloadStatus = INIT;
     private InternalHandler mHandler;
     private NotificationManager mNotificationManager;
@@ -72,7 +74,7 @@ public class DownloadManager implements Runnable {
     private boolean enableNotification = true;//是否发送通知
     private boolean enableWriteChannelInfo = true;//是否写入渠道
     private UpgradeInfo mUpgradeInfo = null;
-    private static final int MAX_PROGRESS = 100;
+    private OnInstallApkListener mOnInstallerListener;
 
     private DownloadManager(Context context) {
         mContext = context;
@@ -125,6 +127,18 @@ public class DownloadManager implements Runnable {
         this.mUpgradeInfo = upgradeInfo;
     }
 
+    public OnInstallApkListener getOnInstallerListener() {
+        return mOnInstallerListener;
+    }
+
+    public void setOnInstallerListener(OnInstallApkListener mOnInstallerListener) {
+        this.mOnInstallerListener = mOnInstallerListener;
+    }
+
+    public void releaseOnInstallerListener() {
+        this.mOnInstallerListener = null;
+    }
+
     /**
      * 下载状态
      *
@@ -139,7 +153,7 @@ public class DownloadManager implements Runnable {
      *
      * @param listener
      */
-    public void registerDownloadListener(@NonNull DownloadListener listener) {
+    public void registerDownloadListener(@NonNull OnDownloadListener listener) {
         if (mListeners == null) {
             mListeners = new LinkedList<>();
         }
@@ -154,7 +168,7 @@ public class DownloadManager implements Runnable {
      * @param listener
      * @return
      */
-    public boolean unregisterDownloadListener(@NonNull DownloadListener listener) {
+    public boolean unregisterDownloadListener(@NonNull OnDownloadListener listener) {
         return mListeners.remove(listener);
     }
 
@@ -443,7 +457,7 @@ public class DownloadManager implements Runnable {
             isComplete = true;
         } catch (IOException e) {
             e.printStackTrace();
-            Loge(TAG, "writeApk: e:"+e.getMessage());
+            Loge(TAG, "writeApk: e:" + e.getMessage());
             if (e instanceof InterruptedIOException) {
                 sendPauseMsg();
             } else {
@@ -488,7 +502,7 @@ public class DownloadManager implements Runnable {
                         int downloadLen = msg.arg2;
                         int progress = (int) obj;
                         if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
+                            for (OnDownloadListener mListener : mListeners) {
                                 if (mListener != null) {
                                     mListener.onReceive(contentLen, downloadLen, progress);
                                 }
@@ -503,7 +517,7 @@ public class DownloadManager implements Runnable {
                     obj = msg.obj;
                     if (obj instanceof IOException) {
                         if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
+                            for (OnDownloadListener mListener : mListeners) {
                                 if (mListener != null) {
                                     mListener.onFailed((IOException) obj);
                                 }
@@ -518,7 +532,7 @@ public class DownloadManager implements Runnable {
                     obj = msg.obj;
                     if (obj != null) {
                         if (mListeners != null) {
-                            for (DownloadListener mListener : mListeners) {
+                            for (OnDownloadListener mListener : mListeners) {
                                 if (mListener != null) {
                                     mListener.onCompleted(obj.toString());
                                 }
@@ -533,7 +547,7 @@ public class DownloadManager implements Runnable {
                     mDownloadStatus = PAUSED;
                     onPause();
                     if (mListeners != null) {
-                        for (DownloadListener mListener : mListeners) {
+                        for (OnDownloadListener mListener : mListeners) {
                             if (mListener != null) {
                                 mListener.onPaused();
                             }

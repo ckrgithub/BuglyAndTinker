@@ -6,10 +6,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.DownloadManager;
 import com.tencent.bugly.beta.Beta;
@@ -17,10 +18,11 @@ import com.tencent.bugly.beta.tinker.TinkerManager;
 
 import java.io.File;
 
-import static com.ckr.upgrade.dialog.UpgradeDialogFragment.REQUEST_CODE_INSTALL;
+import static com.ckr.upgrade.util.ApkUtil.REQUEST_CODE_INSTALL;
+import static com.ckr.upgrade.util.DownloadManager.COMPLETE;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, OnInstallApkListener {
     private static final String TAG = "MainActivity";
     private TextView versionView;
     private TextView tinkerIdView;
@@ -60,6 +62,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Logd(TAG, "onActivityResult: requestCode:" + requestCode + ",resultCode:" + resultCode);
+        if (requestCode == REQUEST_CODE_INSTALL) {
+            Context context = getContext();
+            boolean canInstall = ApkUtil.hasInstallPermission(context);
+            if (canInstall) {
+                DownloadManager with = DownloadManager.with(context);
+                UpgradeInfo upgradeInfo = with.getUpgradeInfo();
+                if (upgradeInfo != null) {
+                    int downloadStatus = with.getDownloadStatus();
+                    if (downloadStatus == COMPLETE) {
+                        ApkUtil.installApk(ApkUtil.getApkPath(upgradeInfo.apkUrl, context), context);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -135,5 +151,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 DownloadManager.with(this.getApplicationContext()).pauseDownload();
                 break;
         }
+    }
+
+    @Override
+    public void requestInstallPermission() {
+        ApkUtil.openUnknownAppSourcesActivity(this);
     }
 }

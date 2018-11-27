@@ -1,12 +1,17 @@
 package com.ckr.upgrade.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+
+import com.ckr.upgrade.listener.OnInstallApkListener;
 
 import java.io.File;
 
@@ -18,6 +23,7 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class ApkUtil {
     private static final String TAG = "ApkUtil";
+    public static final int REQUEST_CODE_INSTALL = 1129;
 
     /**
      * 获取apk名
@@ -66,6 +72,10 @@ public class ApkUtil {
             canInstall = context.getPackageManager().canRequestPackageInstalls();
         }
         if (!canInstall) {
+            OnInstallApkListener onInstallerListener = DownloadManager.with(context).getOnInstallerListener();
+            if (onInstallerListener != null) {
+                onInstallerListener.requestInstallPermission();
+            }
             return false;
         }
         try {
@@ -99,5 +109,50 @@ public class ApkUtil {
             imageUri = Uri.fromFile(file);
         }
         return imageUri;
+    }
+
+    /**
+     * 是否有安装未知来源的应用程序权限
+     *
+     * @return
+     */
+    public static boolean hasInstallPermission(@NonNull Context context) {
+        boolean canInstall = true;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            canInstall = context.getPackageManager().canRequestPackageInstalls();
+        }
+        return canInstall;
+    }
+
+
+    /**
+     * 打开设置页
+     */
+    public static void openUnknownAppSourcesActivity(@NonNull Object obj) {
+        if (obj instanceof Activity) {
+            Activity activity = ((Activity) obj);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+                intent.setData(uri);
+                activity.startActivityForResult(intent, REQUEST_CODE_INSTALL);
+            }
+        } else if (obj instanceof Fragment) {
+            Fragment fragment = ((Fragment) obj);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                Uri uri = Uri.fromParts("package", fragment.getContext().getPackageName(), null);
+                intent.setData(uri);
+                fragment.startActivityForResult(intent, REQUEST_CODE_INSTALL);
+            }
+        } else if (obj instanceof android.app.Fragment) {
+            android.app.Fragment fragment = ((android.app.Fragment) obj);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                Uri uri = Uri.fromParts("package", fragment.getContext().getPackageName(), null);
+                intent.setData(uri);
+                fragment.startActivityForResult(intent, REQUEST_CODE_INSTALL);
+            }
+        }
     }
 }
