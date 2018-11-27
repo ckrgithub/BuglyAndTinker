@@ -132,8 +132,9 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
     }
 
     private String getText() {
-        int mDownloadStatus = getDownloadStatus();
         String positive = null;
+
+        int mDownloadStatus = getDownloadStatus();
         switch (mDownloadStatus) {
             case INIT:
                 positive = getString(R.string.download_status_init);
@@ -203,10 +204,8 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
             if (!TextUtils.isEmpty(apkPath)) {
                 File file = new File(apkPath);
                 Logd(TAG, "getDownloadStatus: len:" + file.length() + ",fileSize:" + fileSize);
-                if (file.exists()) {
-                    if (file.length() == fileSize) {
-                        return COMPLETE;
-                    }
+                if (file.length() >= fileSize) {
+                    return COMPLETE;
                 }
             }
         }

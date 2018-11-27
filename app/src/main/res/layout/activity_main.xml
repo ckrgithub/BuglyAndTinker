@@ -58,10 +58,10 @@
         app:layout_constraintTop_toBottomOf="@+id/checkUpgrade" />
 
     <Button
-        android:id="@+id/btnReceiver"
+        android:id="@+id/btnInstaller"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="注册广播"
+        android:text="安装apk"
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/btnService"
         app:layout_constraintTop_toTopOf="@+id/btnService" />
@@ -71,8 +71,8 @@
         android:layout_height="wrap_content"
         android:text="发送通知"
         android:textSize="18sp"
-        app:layout_constraintLeft_toRightOf="@+id/btnReceiver"
-        app:layout_constraintTop_toTopOf="@+id/btnReceiver" />
+        app:layout_constraintLeft_toRightOf="@+id/btnInstaller"
+        app:layout_constraintTop_toTopOf="@+id/btnInstaller" />
     <Button
         android:id="@+id/btnDownload"
         android:layout_width="wrap_content"
