@@ -40,6 +40,19 @@ android {
             outputFileName = 'Upgrade' + '-' + variant.buildType.name + '-v' + defaultConfig.versionName + '.' + defaultConfig.versionCode + '.apk'
         }
     }
+
+    sourceSets {
+        main {
+            println "srcFile:${androidConfig.upgradeWay == "0"},${androidConfig.upgradeWay}"
+            if (androidConfig.upgradeWay == "0") {
+                manifest.srcFile 'src/main/all/AndroidManifest.xml'
+            } else if (androidConfig.upgradeWay == "1") {
+                manifest.srcFile 'src/main/upgrade/AndroidManifest.xml'
+            } else {
+                manifest.srcFile 'src/main/hotfix/AndroidManifest.xml'
+            }
+        }
+    }
 }
 
 dependencies {

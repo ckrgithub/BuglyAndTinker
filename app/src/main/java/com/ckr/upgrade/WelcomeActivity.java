@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.ckr.upgrade.permission.PermissionManager;
+import com.ckr.upgrade.util.UpgradeLog;
 import com.tencent.bugly.beta.Beta;
 
 public class WelcomeActivity extends BaseActivity {
@@ -22,6 +23,7 @@ public class WelcomeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+        UpgradeLog.debug(BuildConfig.IS_DEBUG);
         findViewById(R.id.welcome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
