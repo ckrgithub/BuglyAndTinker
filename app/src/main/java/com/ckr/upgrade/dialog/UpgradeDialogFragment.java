@@ -1,15 +1,20 @@
 package com.ckr.upgrade.dialog;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.UpgradeInfo;
@@ -32,8 +37,7 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class UpgradeDialogFragment extends BaseDialogFragment implements DownloadListener {
     private static final String TAG = "BaseDialogFragment";
-    protected static final long MB = 1024 * 1024;
-    protected static final int SCALE_VALUE = 2;
+    public static final int REQUEST_CODE_INSTALL = 1129;
     protected static final String TYPE_CANCELABLE = "cancelableType";
     // 建议升级
     protected static final int STRATEGY_OPTIONAL = 1;
@@ -101,6 +105,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
         String title = upgradeInfo.title;
         String newFeature = upgradeInfo.newFeature;
         int upgradeType = upgradeInfo.upgradeType;
+        Logd(TAG, "onViewCreated: title:" + title + ",newFeature:" + newFeature);
 
         titleView.setText(title);
         msgView.setText(newFeature);
@@ -171,8 +176,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
                 Logd(TAG, "onClick: downloadStatus:" + downloadStatus);
                 if (downloadStatus == COMPLETE) {
                     String apkUrl = upgradeInfo.apkUrl;
-                    Context context = getContext();
-                    ApkUtil.installApk(ApkUtil.getApkPath(apkUrl, context), context);
+                    installApk(apkUrl, true);
                 } else if (downloadStatus == PAUSED) {
                     downloadManager.resumeDownload();
                 } else if (downloadStatus == FAILED || downloadStatus == INIT) {
@@ -187,6 +191,68 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements Downloa
             case R.id.btnNegative:
                 dismiss();
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_INSTALL) {
+            boolean canInstall = hasInstallPermission();
+            if (canInstall) {
+                DownloadManager with = DownloadManager.with(getContext());
+                UpgradeInfo upgradeInfo = with.getUpgradeInfo();
+                if (upgradeInfo != null) {
+                    int downloadStatus = with.getDownloadStatus();
+                    if (downloadStatus == COMPLETE) {
+                        installApk(upgradeInfo.apkUrl, false);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 是否有安装未知来源的应用程序权限
+     *
+     * @return
+     */
+    private boolean hasInstallPermission() {
+        boolean canInstall = true;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            canInstall = getContext().getPackageManager().canRequestPackageInstalls();
+        }
+        return canInstall;
+    }
+
+    /**
+     * 打开设置页
+     */
+    private void openSettingActivity() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+            Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+            intent.setData(uri);
+            this.startActivityForResult(intent, REQUEST_CODE_INSTALL);
+        }
+    }
+
+    /**
+     * 适配android O apk安装
+     *
+     * @param apkUrl
+     * @return
+     */
+    private void installApk(String apkUrl, boolean isOpenSetting) {
+        boolean canInstall = hasInstallPermission();
+        Context context = getContext();
+        if (canInstall) {
+            ApkUtil.installApk(ApkUtil.getApkPath(apkUrl, context), context);
+        } else {
+            Toast.makeText(context, context.getString(R.string.tips_install_permission), Toast.LENGTH_LONG).show();
+            if (isOpenSetting) {
+                openSettingActivity();
+            }
         }
     }
 

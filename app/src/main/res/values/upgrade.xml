@@ -18,8 +18,10 @@
     <string name="notification_status_pause">暂停中</string>
     <string name="notification_content_title">@string/app_name</string>
     <string name="notification_ticker">更新中</string>
-    
-    
+
+    <string name="tips_install_permission">请允许安装未知来源的应用程序</string>
+
+
     <integer name="time_light_on">1500</integer>
     <integer name="time_light_off">150</integer>
 
@@ -48,10 +50,11 @@
     <color name="dialog_vertical_line_background">#ccc</color>
     <color name="dialog_btn_negative">#0076ff</color>
     <color name="dialog_btn_positive">#0076ff</color>
-    <color name="notification_light_color">#fff</color>
     <color name="dialog_background_color">#fff</color>
     <color name="dialog_btn_press_color">#e1e1e1</color>
     <color name="dialog_btn_normal_color">@android:color/transparent</color>
+
+    <color name="notification_light_color">#fff</color>
 
 
     <style name="Base_Dialog_Style" parent="@android:style/Theme.Dialog">

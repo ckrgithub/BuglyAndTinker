@@ -17,11 +17,11 @@ import com.tencent.bugly.beta.tinker.TinkerManager;
 
 import java.io.File;
 
+import static com.ckr.upgrade.dialog.UpgradeDialogFragment.REQUEST_CODE_INSTALL;
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
-    private static final int REQUEST_CODE_INSTALL = 1129;
     private TextView versionView;
     private TextView tinkerIdView;
     private View checkUpgrade;
