@@ -9,7 +9,6 @@ ext {
             compileSdkVersion: 27,
             minSdkVersion    : 16,
             targetSdkVersion : 27,
-            upgradeWay: "0"//0:集成全量更新和热更新  1:仅集成全量更新  2:仅集成热更新
     ]
 
     supportVersion = "27.1.1"
