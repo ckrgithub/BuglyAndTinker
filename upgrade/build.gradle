@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion androidConfig.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion androidConfig.minSdkVersion
+        targetSdkVersion androidConfig.targetSdkVersion
+        versionCode appConfig.versionCode
+        versionName appConfig.versionName
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly applyConfig.appcompat_v7
+    compileOnly applyConfig.support_v4
+    implementation applyConfig.constraint_layout
+    api project(':walle')
+    compileOnly applyConfig.bugly_crashreport
+    compileOnly applyConfig.bugly_nativecrashreport
+    compileOnly applyConfig.okhttp
+}

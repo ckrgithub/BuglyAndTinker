@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"
+    android:layout_marginLeft="@dimen/dialog_margin_left"
+    android:layout_marginRight="@dimen/dialog_margin_right"
+    android:background="@drawable/bg_upgrade_dialog">
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_title_margin_top"
+        android:paddingLeft="@dimen/dialog_padding_left"
+        android:paddingRight="@dimen/dialog_padding_right"
+        android:textColor="@color/dialog_title_text_color"
+        android:textSize="@dimen/dialog_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/msgView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_msg_margin_top"
+        android:lineSpacingMultiplier="1.2"
+        android:paddingLeft="@dimen/dialog_padding_left"
+        android:paddingRight="@dimen/dialog_padding_right"
+        android:textColor="@color/dialog_msg_text_color"
+        android:textSize="@dimen/dialog_msg_text_size"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleView"/>
+
+
+    <View
+        android:id="@+id/horizontalLine"
+        style="@style/upgrade_horizontal_line"
+        android:layout_marginTop="@dimen/dialog_horizontal_line_margin_top"
+        app:layout_constraintTop_toBottomOf="@+id/msgView"/>
+
+    <View
+        android:id="@+id/verticalLine"
+        style="@style/upgrade_vertical_line"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalLine"/>
+
+    <TextView
+        android:id="@+id/btnNegative"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dialog_btn_height"
+        android:background="@drawable/selector_dialog_negative_button"
+        android:gravity="center"
+        android:text="@string/upgrade_btn_negative"
+        android:textColor="@color/dialog_btn_negative"
+        android:textSize="@dimen/dialog_btn_text_size"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/verticalLine"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalLine"/>
+
+
+    <TextView
+        android:id="@+id/btnPositive"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dialog_btn_height"
+        android:background="@drawable/selector_dialog_positive_button"
+        android:gravity="center"
+        android:text="@string/upgrade_btn_positive"
+        android:textColor="@color/dialog_btn_positive"
+        android:textSize="@dimen/dialog_btn_text_size"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toRightOf="@+id/verticalLine"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalLine"/>
+
+</android.support.constraint.ConstraintLayout>
