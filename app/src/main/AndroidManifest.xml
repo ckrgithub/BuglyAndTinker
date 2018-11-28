@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.ckr.bugly">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -36,19 +35,6 @@
         <service
             android:name=".DownLoadService"
             android:exported="false" />
-
-<!--        &lt;!&ndash; android 7.0或以上设备访问共享文件的适配 &ndash;&gt;
-        <provider
-            android:name="com.ckr.upgrade.provider.MyFileProvider"
-            android:authorities="${applicationId}.fileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true"
-            tools:replace="name,authorities,exported,grantUriPermissions">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"
-                tools:replace="name,resource" />
-        </provider>-->
 
     </application>
 

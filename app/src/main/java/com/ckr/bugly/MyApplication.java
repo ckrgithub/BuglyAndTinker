@@ -19,6 +19,7 @@ import com.tencent.tinker.loader.shareutil.ShareConstants;
         loadVerifyFlag = false)
 public class MyApplication extends DefaultApplicationLike {
     private static MyApplication instance;
+    private static final String BUGLY_ID = "83ffe4ff10";
 
     public static MyApplication getInstance() {
         return instance;
@@ -39,8 +40,9 @@ public class MyApplication extends DefaultApplicationLike {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        UpgradeConfig upgradeConfig = new UpgradeConfig(BuildConfig.IS_DEBUG, BUGLY_ID, BuildConfig.VERSION_NAME, R.mipmap.ic_launcher);
         //升级功能配置
-        UpgradeConfig.init(getApplication(), R.mipmap.ic_launcher, BuildConfig.VERSION_NAME, BuildConfig.IS_DEBUG);
+        UpgradeConfig.init(getApplication(), upgradeConfig);
     }
 
 

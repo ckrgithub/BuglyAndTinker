@@ -24,7 +24,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 public abstract class BaseDialogFragment extends DialogFragment implements View.OnClickListener, DialogInterface.OnKeyListener {
-	private static final String TAG = "BaseDialogFragment";
 	public static final int DEFAULT = 0;
 	public static final int IS_CANCELED_ON_TOUCH_OUTSIDE = 1;
 	public static final int IS_CANCELED_ON_KEYCODE_BACK = 2;

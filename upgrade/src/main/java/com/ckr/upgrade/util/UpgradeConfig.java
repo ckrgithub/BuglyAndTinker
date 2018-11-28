@@ -3,12 +3,10 @@ package com.ckr.upgrade.util;
 import android.app.Application;
 import android.content.Context;
 import android.os.Process;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.ckr.upgrade.BuildConfig;
-import com.ckr.upgrade.listener.MyUpgradeListener;
+import com.ckr.upgrade.listener.ApkUpgradeListener;
 import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
@@ -18,26 +16,35 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
-
 /**
  * Created by ckr on 2018/11/27.
  */
 
 public class UpgradeConfig {
     private static final String TAG = "UpgradeConfig";
-    private static final String BUGLY_ID = "83ffe4ff10";
     public static int smallIconId = -1;
+
+    private boolean isDebug = false;
+    private String buglyId = null;
+    private String appVersion = null;
+    private int notificationIconId = -1;
+
+    public UpgradeConfig(boolean isDebug, String buglyId, String appVersion, int notificationIconId) {
+        this.isDebug = isDebug;
+        this.buglyId = buglyId;
+        this.appVersion = appVersion;
+        this.notificationIconId = notificationIconId;
+    }
 
     /**
      * 应用升级和异常上报
      *
      * @param application
      */
-    public static void init(@NonNull Application application, @DrawableRes int smallIconId,String appVersion,boolean isDebug) {
+    public static void init(@NonNull Application application, @NonNull UpgradeConfig config) {
         long startTime = System.currentTimeMillis();
         UpgradeLog.Logd(TAG, "init: startTime:" + startTime);
-        UpgradeConfig.smallIconId = smallIconId;
+        UpgradeConfig.smallIconId = config.notificationIconId;
         AppTracker appTracker = new AppTracker();
         application.registerActivityLifecycleCallbacks(appTracker);
 
@@ -48,7 +55,7 @@ public class UpgradeConfig {
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(context);
         strategy.setUploadProcess(processName == null || processName.equals(packageName));//设置上报进程
         strategy.setAppChannel(ChannelUtil.getChannelInfo(context));//设置渠道信息
-        strategy.setAppVersion(appVersion);//app版本
+        strategy.setAppVersion(config.appVersion);//app版本
         strategy.setAppPackageName(packageName);//app包名
         strategy.setAppReportDelay(10 * 1000);//Bugly在启动10s后联网同步数据
 //        CrashReport.setUserSceneTag(context,20181110);//设置标签，标明app的某个场景
@@ -73,9 +80,9 @@ public class UpgradeConfig {
         Beta.enableHotfix = true;//设置开启热更新
 //      </editor-fold>
 
-        Beta.upgradeListener = new MyUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听
+        Beta.upgradeListener = new ApkUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听
         //初始化统一接口
-        Bugly.init(context, BUGLY_ID, isDebug, strategy);
+        Bugly.init(context, config.buglyId, config.isDebug, strategy);
         UpgradeLog.Logd(TAG, "init: usedTime:" + (System.currentTimeMillis() - startTime));
     }
 

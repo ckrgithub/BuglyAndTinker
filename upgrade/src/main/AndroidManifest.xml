@@ -11,7 +11,7 @@
     <application>
         <!-- android 7.0或以上设备访问共享文件的适配 -->
         <provider
-            android:name=".provider.MyFileProvider"
+            android:name=".provider.ApkFileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -19,7 +19,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
 
         <receiver
             android:name=".DownloadReceiver"

@@ -10,19 +10,16 @@ import com.ckr.upgrade.util.UpgradeLog;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
-import static com.ckr.upgrade.util.UpgradeLog.Loge;
-
 /**
  * Created by ckr on 2018/11/10.
  */
 
-public class MyUpgradeListener implements UpgradeListener, Runnable {
-	private static final String TAG = "MyUpgradeListener";
+public class ApkUpgradeListener implements UpgradeListener, Runnable {
+	private static final String TAG = "ApkUpgradeListener";
 	private final AppTracker appTracker;
 	private final Context context;
 
-	public MyUpgradeListener(@NonNull AppTracker appTracker, Context context) {
+	public ApkUpgradeListener(@NonNull AppTracker appTracker, Context context) {
 		this.appTracker = appTracker;
 		this.context = context;
 	}

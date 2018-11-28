@@ -16,8 +16,6 @@ import com.ckr.upgrade.listener.OnInstallApkListener;
 
 import java.io.File;
 
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
-
 /**
  * Created by ckr on 2018/11/12.
  */

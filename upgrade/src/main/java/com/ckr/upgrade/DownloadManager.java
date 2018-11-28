@@ -16,7 +16,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-import com.ckr.upgrade.R;
 import com.ckr.upgrade.listener.OnDownloadListener;
 import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.upgrade.util.ApkUtil;
@@ -43,8 +42,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
-import static com.ckr.upgrade.util.UpgradeLog.Loge;
 
 /**
  * Created by ckr on 2018/11/13.

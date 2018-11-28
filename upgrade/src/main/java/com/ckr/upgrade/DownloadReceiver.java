@@ -14,7 +14,6 @@ import static com.ckr.upgrade.DownloadManager.DOWNLOAD_PROGRESS;
 import static com.ckr.upgrade.DownloadManager.FAILED;
 import static com.ckr.upgrade.DownloadManager.INIT;
 import static com.ckr.upgrade.DownloadManager.PAUSED;
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/12.

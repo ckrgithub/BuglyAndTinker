@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.DownloadManager;
 import com.ckr.upgrade.R;
 import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.OnDownloadListener;
 import com.ckr.upgrade.listener.OnInstallApkListener;
+import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.UpgradeLog;
 
 import java.io.File;
@@ -28,7 +28,6 @@ import static com.ckr.upgrade.DownloadManager.COMPLETE;
 import static com.ckr.upgrade.DownloadManager.FAILED;
 import static com.ckr.upgrade.DownloadManager.INIT;
 import static com.ckr.upgrade.DownloadManager.PAUSED;
-import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/11.
