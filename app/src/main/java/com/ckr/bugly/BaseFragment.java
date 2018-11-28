@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
-import com.ckr.bugly.dialog.BaseDialogFragment;
+import com.ckr.upgrade.dialog.BaseDialogFragment;
 import com.ckr.bugly.dialog.PermissionDialogFragment;
 import com.ckr.bugly.permission.PermissionManager;
 

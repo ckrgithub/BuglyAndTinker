@@ -6,9 +6,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.ckr.bugly.util.DownloadManager;
 
-import static com.ckr.bugly.util.UpgradeLog.Logd;
+import com.ckr.upgrade.DownloadManager;
+
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created on 2018/11/11

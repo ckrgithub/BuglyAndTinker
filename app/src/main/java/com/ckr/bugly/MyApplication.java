@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
-import com.ckr.bugly.util.BuglyConfig;
+import com.ckr.upgrade.util.UpgradeConfig;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.tinker.anno.DefaultLifeCycle;
 import com.tencent.tinker.entry.DefaultApplicationLike;
@@ -40,7 +40,7 @@ public class MyApplication extends DefaultApplicationLike {
         super.onCreate();
         instance = this;
         //升级功能配置
-        BuglyConfig.init(getApplication());
+        UpgradeConfig.init(getApplication(), R.mipmap.ic_launcher, BuildConfig.VERSION_NAME, BuildConfig.IS_DEBUG);
     }
 
 

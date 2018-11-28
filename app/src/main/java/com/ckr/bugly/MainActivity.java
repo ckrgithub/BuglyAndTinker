@@ -9,17 +9,18 @@ import android.support.annotation.IdRes;
 import android.view.View;
 import android.widget.TextView;
 
-import com.ckr.bugly.listener.OnInstallApkListener;
-import com.ckr.bugly.util.ApkUtil;
-import com.ckr.bugly.util.DownloadManager;
+import com.ckr.upgrade.DownloadManager;
+import com.ckr.upgrade.UpgradeInfo;
+import com.ckr.upgrade.listener.OnInstallApkListener;
+import com.ckr.upgrade.util.ApkUtil;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.tinker.TinkerManager;
 
 import java.io.File;
 
-import static com.ckr.bugly.util.ApkUtil.REQUEST_CODE_INSTALL;
-import static com.ckr.bugly.util.DownloadManager.COMPLETE;
-import static com.ckr.bugly.util.UpgradeLog.Logd;
+import static com.ckr.upgrade.DownloadManager.COMPLETE;
+import static com.ckr.upgrade.util.ApkUtil.REQUEST_CODE_INSTALL;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, OnInstallApkListener {
     private static final String TAG = "MainActivity";
@@ -113,7 +114,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         String apkUrl = upgradeInfo.apkUrl;
                         String path = ApkUtil.getApkPath(apkUrl, this);
                         int downloadStatus = downloadManager.getDownloadStatus();
-                        boolean isComplete = downloadStatus == DownloadManager.COMPLETE;
+                        boolean isComplete = downloadStatus == COMPLETE;
                         if (!isComplete) {
                             long fileSize = upgradeInfo.fileSize;
                             File file = new File(path);

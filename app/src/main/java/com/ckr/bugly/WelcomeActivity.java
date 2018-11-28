@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.ckr.bugly.permission.PermissionManager;
-import com.ckr.bugly.util.UpgradeLog;
+import com.ckr.upgrade.util.UpgradeLog;
 import com.tencent.bugly.beta.Beta;
 
 public class WelcomeActivity extends BaseActivity {

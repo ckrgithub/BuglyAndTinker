@@ -37,17 +37,9 @@
             android:name=".DownLoadService"
             android:exported="false" />
 
-        <receiver
-            android:name=".DownloadReceiver"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="apk_download_receiver"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- android 7.0或以上设备访问共享文件的适配 -->
+<!--        &lt;!&ndash; android 7.0或以上设备访问共享文件的适配 &ndash;&gt;
         <provider
-            android:name=".provider.MyFileProvider"
+            android:name="com.ckr.upgrade.provider.MyFileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true"
@@ -56,7 +48,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"
                 tools:replace="name,resource" />
-        </provider>
+        </provider>-->
 
     </application>
 

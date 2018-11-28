@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ckr.bugly.R;
-import com.ckr.bugly.listener.MyDownloadListener;
+import com.ckr.upgrade.dialog.BaseDialogFragment;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.download.DownloadTask;
 
@@ -35,7 +35,6 @@ public class PermissionDialogFragment extends BaseDialogFragment {
 
     private TextView btnOK;
     private String positive = "立即更新";
-    private MyDownloadListener downloadListener;
     private static OnDialogClickListener onDialogClickListener;
 
     public static PermissionDialogFragment newInstance(String title, String msg, String positive, String negative, @CancelableType int cancelableType, OnDialogClickListener onDialogClickListener) {
