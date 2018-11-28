@@ -2,7 +2,7 @@ ext {
     appConfig = [
             versionCode  : 100,
             versionName  : "1.0.0",
-            applicationId: "com.ckr.upgrade",
+            applicationId: "com.ckr.bugly",
     ]
 
     androidConfig = [
