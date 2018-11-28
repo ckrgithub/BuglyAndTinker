@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
+import com.ckr.upgrade.UpgradeConfig;
 import com.ckr.upgrade.dialog.UpgradeDialogFragment;
+
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/10.
@@ -21,7 +25,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
     }
 
     public void showDialog(boolean isShow) {
-        UpgradeLog.Logd(TAG, "showDialog: isShow:" + isShow + ",activity:" + activity);
+        Logd(TAG, "showDialog: isShow:" + isShow + ",activity:" + activity);
         canShow = isShow;
         if (!canShow) {
             return;
@@ -31,7 +35,7 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
         }
         canShow = false;
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
-                .setOnDialogClickListener(this)
+//                .setOnDialogClickListener(this)
                 .build();
         if (activity instanceof FragmentActivity) {
             dialogFragment.showAllowingStateLoss(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
@@ -45,19 +49,37 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
 
     @Override
     public void onActivityResumed(Activity activity) {
-//        if (activity instanceof MainActivity) {
-//            Logd(TAG, "onActivityResumed: ");
-//            this.activity = activity;
-//            showDialog(canShow);
-//        }
+        if (activity instanceof FragmentActivity) {
+            int size = UpgradeConfig.canShowUpgradeActs.size();
+            if (size == 0) {
+                this.activity = activity;
+                showDialog(canShow);
+            } else {
+                for (Class<? extends Activity> act : UpgradeConfig.canShowUpgradeActs) {
+                    if (act.isInstance(activity)) {
+                        Log.d(TAG, "onActivityResumed: activity:" + activity);
+                        this.activity = activity;
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-//        if (activity instanceof MainActivity) {
-//            Logd(TAG, "onActivityPaused: ");
-//            this.activity = null;
-//        }
+        if (activity instanceof FragmentActivity) {
+            int size = UpgradeConfig.canShowUpgradeActs.size();
+            if (size == 0) {
+                this.activity = null;
+            } else {
+                for (Class<? extends Activity> act : UpgradeConfig.canShowUpgradeActs) {
+                    if (act.isInstance(activity)) {
+                        Log.d(TAG, "onActivityPaused: activity:" + activity);
+                        this.activity = null;
+                    }
+                }
+            }
+        }
     }
 
     @Override
