@@ -4,7 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
-import com.ckr.upgrade.util.UpgradeConfig;
+import com.ckr.upgrade.UpgradeConfig;
+import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.tinker.anno.DefaultLifeCycle;
 import com.tencent.tinker.entry.DefaultApplicationLike;
@@ -40,7 +41,11 @@ public class MyApplication extends DefaultApplicationLike {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        UpgradeConfig upgradeConfig = new UpgradeConfig(BuildConfig.IS_DEBUG, BUGLY_ID, BuildConfig.VERSION_NAME, R.mipmap.ic_launcher);
+        UpgradeConfig.isDebug = BuildConfig.IS_DEBUG;
+        UpgradeConfig.isAutoInstall = true;
+        UpgradeConfig.enableNotification = true;
+        UpgradeConfig.enableWriteChannelInfo = true;
+        UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplication().getApplicationContext()), R.mipmap.ic_launcher);
         //升级功能配置
         UpgradeConfig.init(getApplication(), upgradeConfig);
     }

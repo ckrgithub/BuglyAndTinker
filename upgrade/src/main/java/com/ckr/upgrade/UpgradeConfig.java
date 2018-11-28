@@ -1,4 +1,4 @@
-package com.ckr.upgrade.util;
+package com.ckr.upgrade;
 
 import android.app.Application;
 import android.content.Context;
@@ -7,7 +7,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.ckr.upgrade.listener.ApkUpgradeListener;
-import com.ckr.walle.ChannelUtil;
+import com.ckr.upgrade.util.AppTracker;
+import com.ckr.upgrade.util.UpgradeLog;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -22,17 +23,21 @@ import java.io.IOException;
 
 public class UpgradeConfig {
     private static final String TAG = "UpgradeConfig";
-    public static int smallIconId = -1;
+    static int smallIconId = -1;
+    public static boolean isDebug = false;//是否是debug模式
+    public static boolean isAutoInstall = true;//是否自动安装
+    public static boolean enableNotification = true;//是否发送通知
+    public static boolean enableWriteChannelInfo = true;//是否写入渠道
 
-    private boolean isDebug = false;
-    private String buglyId = null;
-    private String appVersion = null;
-    private int notificationIconId = -1;
+    private String buglyId = null;//buglyId
+    private String appVersion = null;//app版本
+    private String appChannel = null;//app渠道
+    private int notificationIconId = -1;//通知栏小图标id
 
-    public UpgradeConfig(boolean isDebug, String buglyId, String appVersion, int notificationIconId) {
-        this.isDebug = isDebug;
+    public UpgradeConfig(String buglyId, String appVersion, String appChannel, int notificationIconId) {
         this.buglyId = buglyId;
         this.appVersion = appVersion;
+        this.appChannel = appChannel;
         this.notificationIconId = notificationIconId;
     }
 
@@ -54,7 +59,7 @@ public class UpgradeConfig {
         String processName = getProcessName(Process.myPid());//当前进程名
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(context);
         strategy.setUploadProcess(processName == null || processName.equals(packageName));//设置上报进程
-        strategy.setAppChannel(ChannelUtil.getChannelInfo(context));//设置渠道信息
+        strategy.setAppChannel(config.appChannel);//设置渠道信息
         strategy.setAppVersion(config.appVersion);//app版本
         strategy.setAppPackageName(packageName);//app包名
         strategy.setAppReportDelay(10 * 1000);//Bugly在启动10s后联网同步数据
@@ -82,7 +87,7 @@ public class UpgradeConfig {
 
         Beta.upgradeListener = new ApkUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听
         //初始化统一接口
-        Bugly.init(context, config.buglyId, config.isDebug, strategy);
+        Bugly.init(context, config.buglyId, isDebug, strategy);
         UpgradeLog.Logd(TAG, "init: usedTime:" + (System.currentTimeMillis() - startTime));
     }
 

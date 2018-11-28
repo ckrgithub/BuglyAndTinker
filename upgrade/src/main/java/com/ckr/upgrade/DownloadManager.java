@@ -20,7 +20,6 @@ import com.ckr.upgrade.listener.OnDownloadListener;
 import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.OkHttpFactory;
-import com.ckr.upgrade.util.UpgradeConfig;
 import com.ckr.upgrade.util.UpgradeLog;
 import com.ckr.walle.ChannelUtil;
 
@@ -69,9 +68,6 @@ public class DownloadManager implements Runnable {
     private NotificationCompat.Builder mBuilder;
     private ExecutorService mExecutor;
     private Future<?> mFuture;
-    private boolean isAutoInstall = true;//是否自动安装
-    private boolean enableNotification = true;//是否发送通知
-    private boolean enableWriteChannelInfo = true;//是否写入渠道
     private UpgradeInfo mUpgradeInfo = null;
     private OnInstallApkListener mOnInstallerListener;
 
@@ -92,30 +88,6 @@ public class DownloadManager implements Runnable {
 
     public Context getContext() {
         return mContext;
-    }
-
-    public void setAutoInstall(boolean autoInstall) {
-        isAutoInstall = autoInstall;
-    }
-
-    public void setEnableNotification(boolean enableNotification) {
-        this.enableNotification = enableNotification;
-    }
-
-    public void setEnableWriteChannelInfo(boolean enableWriteChannelInfo) {
-        this.enableWriteChannelInfo = enableWriteChannelInfo;
-    }
-
-    public boolean isAutoInstall() {
-        return isAutoInstall;
-    }
-
-    public boolean isEnableNotification() {
-        return enableNotification;
-    }
-
-    public boolean isEnableWriteChannelInfo() {
-        return enableWriteChannelInfo;
     }
 
     public UpgradeInfo getUpgradeInfo() {
@@ -309,7 +281,7 @@ public class DownloadManager implements Runnable {
     @Override
     public void run() {
         UpgradeLog.Logd(TAG, "run: ");
-        if (enableNotification) {
+        if (UpgradeConfig.enableNotification) {
             if (mDownloadStatus != RESUMED && mDownloadStatus != DOWNLOADING) {
                 sendNotification();
             }
@@ -475,7 +447,7 @@ public class DownloadManager implements Runnable {
             }
         }
         if (isComplete) {
-            if (enableWriteChannelInfo) {
+            if (UpgradeConfig.enableWriteChannelInfo) {
                 ChannelUtil.setChannelInfo(apkFile, ChannelUtil.getChannelInfo(mContext), true);
             }
             sendCompleteMsg(apkFile.getAbsolutePath());
@@ -537,7 +509,7 @@ public class DownloadManager implements Runnable {
                                 }
                             }
                         }
-                        if (isAutoInstall) {
+                        if (UpgradeConfig.isAutoInstall) {
                             ApkUtil.installApk(obj.toString(), mContext);
                         }
                     }
