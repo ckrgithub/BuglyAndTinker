@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.ckr.upgrade.UpgradeConfig;
+import com.ckr.upgrade.util.UpgradeLog;
 import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.tinker.anno.DefaultLifeCycle;
@@ -40,11 +41,13 @@ public class MyApplication extends DefaultApplicationLike {
     @Override
     public void onCreate() {
         super.onCreate();
+        UpgradeLog.debug(BuildConfig.IS_DEBUG);
         instance = this;
         UpgradeConfig.isDebug = BuildConfig.IS_DEBUG;
         UpgradeConfig.isAutoInstall = true;
         UpgradeConfig.enableNotification = true;
         UpgradeConfig.enableWriteChannelInfo = true;
+        UpgradeConfig.canShowUpgradeActs.add(MainActivity.class);
         UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplication().getApplicationContext()), R.mipmap.ic_launcher);
         //升级功能配置
         UpgradeConfig.init(getApplication(), upgradeConfig);
