@@ -4,6 +4,30 @@ def bakPath = file("${buildDir}/bakApk/")
 //此处填写每次构建生产的基准包文件
 def baseApkDir = "app-1109-10-43-04"
 
+def isDebug(){
+    return true
+}
+
+def getBuildTypeName() {
+    return isDebug() ? "debug" : "release"
+}
+
+def getVersion() {
+    return "${appConfig.versionName}.${appConfig.versionCode}"
+}
+
+def getApkName() {
+    return "Upgrade-${getBuildTypeName()}-v${getVersion()}.apk"
+}
+
+def getRFileName() {
+    return "app-${getBuildTypeName()}-R.txt"
+}
+
+def getTinkerIdValue() {
+    return "app-${getVersion()}"
+}
+
 tinkerSupport {
     //开启tinker-support插件，默认值true
     enable = true
@@ -15,21 +39,21 @@ tinkerSupport {
     overrideTinkerPatchConfiguration = true
 
     //编译补丁包，必须指定基准版本的apk
-    baseApk = "${bakPath}/${baseApkDir}/YDH-v1.0.8.202.apk"
+    baseApk = "${bakPath}/${baseApkDir}/${getApkName()}"
 
     //对应tinker插件applyMapping
 //    baseApkProguardMapping = "${bakPath}/${baseApkDir}/app-release-mapping.txt"
     //对应tinker插件的applyResourceMapping
-    baseApkResourceMapping = "${bakPath}/${baseApkDir}/app-release-R.txt"
+    baseApkResourceMapping = "${bakPath}/${baseApkDir}/${getRFileName()}"
 
     //构建基准包和补丁包都要指定不同的tinkerId,并且必须保持唯一性
-    tinkerId = "patch-1.0.8.202"
+    tinkerId = getTinkerIdValue()
 
     //构建多渠道补丁时使用
     // buildAllFlavorsDir="${bakPath}/${baseApkDir}"
 
     //是否启用加固模式，默认为false
-     isProtectedApp = true
+    isProtectedApp = true
 
     //是否开启反射Application模式
     enableProxyApplication = false
