@@ -2,7 +2,7 @@ apply plugin: 'com.tencent.bugly.tinker-support'
 //此处填写每次构建生产的基准包目录
 def bakPath = file("${buildDir}/bakApk/")
 //此处填写每次构建生产的基准包文件
-def baseApkDir = "app-1109-10-43-04"
+def baseApkDir = "app-1128-16-46-21"
 
 def isDebug(){
     return true
@@ -25,7 +25,7 @@ def getRFileName() {
 }
 
 def getTinkerIdValue() {
-    return "app-${getVersion()}"
+    return "patch-${getVersion()}"
 }
 
 tinkerSupport {
