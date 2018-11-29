@@ -17,6 +17,7 @@ ext {
     tinkerSupport = "1.1.5"
     walle = "1.1.6"
     okhttp = "3.11.0"
+    jackson = "2.9.7"
 
     applyConfig = [
             appcompat_v7           : "com.android.support:appcompat-v7:${supportVersion}",
@@ -36,5 +37,8 @@ ext {
             bugly_nativecrashreport: "com.tencent.bugly:nativecrashreport:latest.release",
 
             okhttp                 : "com.squareup.okhttp3:okhttp:${okhttp}",
+            jackson_databind                 : "com.fasterxml.jackson.core:jackson-databind:${jackson}",
+            jackson_annotations                : "com.fasterxml.jackson.core:jackson-annotations:${jackson}",
+            jackson_core                 : "com.fasterxml.jackson.core:jackson-core:${jackson}",
     ]
 }
