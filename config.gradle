@@ -11,6 +11,12 @@ ext {
             targetSdkVersion : 27,
     ]
 
+    upgradeConfig = [
+            versionCode: 100,
+            versionName: "1.0.0",
+            publishVersion: "1.0.0"
+    ]
+
     supportVersion = "27.1.1"
     constraintLayout = "1.1.3"
     tinker = "1.9.9"

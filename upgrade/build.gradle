@@ -1,4 +1,21 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+def siteUrl = 'https://github.com/ckrgithub/BuglyAndTinker'
+publish {
+    repoName = 'Upgrade'
+    userOrg = 'ckrjfrog'
+    groupId = 'ckrjfrog.Upgrade'
+    artifactId = 'AppUpgrade'
+    publishVersion = upgradeConfig.publishVersion
+    desc = 'app升级功能'
+    website = siteUrl
+}
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
 
 android {
     compileSdkVersion androidConfig.compileSdkVersion
@@ -6,8 +23,8 @@ android {
     defaultConfig {
         minSdkVersion androidConfig.minSdkVersion
         targetSdkVersion androidConfig.targetSdkVersion
-        versionCode appConfig.versionCode
-        versionName appConfig.versionName
+        versionCode upgradeConfig.versionCode
+        versionName upgradeConfig.versionName
     }
 
     buildTypes {
@@ -18,6 +35,9 @@ android {
 
         debug {
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 
 }
