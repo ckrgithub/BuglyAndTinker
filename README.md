@@ -28,7 +28,8 @@ App全量更新和热更新
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
   }
 ```
-* 代码使用  
+* 代码使用
+
 步骤一.bugly初始化：UpgradeManager.init()
 ```
   UpgradeConfig.isDebug = BuildConfig.IS_DEBUG;
@@ -94,7 +95,8 @@ App全量更新和热更新
   }
 ```
 [tinker_support.gradle在这](app/tinker_support.gradle)
-* 代码使用  
+* 代码使用
+
 步骤一.定制Application
 ```
   @DefaultLifeCycle(application = "com.ckr.bugly.CkrApplication",
