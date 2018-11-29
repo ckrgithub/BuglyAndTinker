@@ -16,12 +16,20 @@ App全量更新和热更新
 ### 1.升级功能
 * 升级功能集成：
 ```
+  android {
+    ndk {
+      //设置支持的SO库
+      abiFilters "armeabi","armeabi-v7a","arm64-v8a","mips","mips64","x86","x86_64"
+    }
+  }
+  
   dependencies {
     implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
   }
 ```
-* 升级配置
+* 代码使用
+步骤一.bugly初始化：UpgradeManager.init()
 ```
   UpgradeConfig.isDebug = BuildConfig.IS_DEBUG;
   UpgradeConfig.isAutoInstall = true;
@@ -32,6 +40,37 @@ App全量更新和热更新
   //升级功能配置
   UpgradeManager.init(getApplication(), upgradeConfig);
 ```
+步骤二.apk下载
+```
+  DownloadManager.with(context).setUpgradeInfo(info);//设置升级信息,注意：设置升级信息一定要在调用下载apk之前
+  DownloadManager.with(context).startDownload();//下载apk
+```
+* 属性说明  
+
+|属性|描述|类型|默认值|
+|---|---|---|---|
+|smallIconId|通知栏小图标资源id|int|-1|
+|isAutoInstall|是否自动安装|boolean|true|
+|enableNotification|是否发送通知|boolean|true|
+|enableWriteChannelInfo|是否写入渠道|boolean|true|
+|canShowUpgradeActs|可以显示升级框的场景|List<Class<? extends Activity>>|无|
+
+* 升级信息
+
+|属性|描述|类型|默认值|
+|---|---|---|---|
+|title|升级标题|String|null|
+|newFeature|升级说明|String|null|
+|publishTime|发布时间|long|0|
+|publishType|发布类型|int|0:测试，1:正式|
+|upgradeType|升级类型|int|1:建议，2:强制|
+|popTimes|升级提醒次数|int|0|
+|popInterval|升级提醒间隔|int|0|
+|versionCode|版本号|int|0|
+|versionName|版本名|String|null|
+|apkUrl|apk下载链接|String|null|
+|fileSize|apk文件大小|long|0|
+
 ### 2.热更新功能
 * tinker热更新集成：
 ```
@@ -47,6 +86,7 @@ App全量更新和热更新
     //provided 'com.tencent.tinker:tinker-android-anno:1.1.5'
   }
   
+  //-----------分割--------------
   buildscript {
     dependencies {
       classpath 'com.tencent.bugly:tinker-support:1.1.5'
@@ -54,32 +94,26 @@ App全量更新和热更新
   }
 ```
 [tinker_support.gradle在这](app/tinker_support.gradle)
-### 3.属性说明
-* 升级配置  
+* 代码使用
+步骤一.定制Application
+```
+  @DefaultLifeCycle(application = "com.ckr.bugly.CkrApplication",
+        flags = ShareConstants.TINKER_ENABLE_ALL,
+        loadVerifyFlag = false)
+  public class UpgradeApplication extends DefaultApplicationLike {
+    @Override
+    public void onBaseContextAttached(Context base) {
+        super.onBaseContextAttached(base);
+        //热更新配置
+        Beta.installTinker(this);
+    }
+  }
+```
+步骤二.生成补丁包
+[基准包生成](img/tinker_1.png)  
+[补丁包生成](img/tinker_2.png)  
+[补丁包上传](img/tinker_3.png)
 
-|属性|描述|类型|默认值|
-|---|---|---|---|
-|smallIconId|通知栏小图标资源id|int|-1|
-|isAutoInstall|是否自动安装|boolean|true|
-|enableNotification|是否发送通知|boolean|true|
-|enableWriteChannelInfo|是否写入渠道|boolean|true|
-|canShowUpgradeActs|可以显示升级框的场景|List<Class<? extends Activity>>|无|
-
-* 升级信息
-
-|属性|描述|类型|默认值|
-|---|---|---|---|
-|title|升级标题|String|""|
-|newFeature|升级说明|String|""|
-|publishTime|发布时间|long|0|
-|publishType|发布类型|int|0:测试，1:正式|
-|upgradeType|升级类型|int|1:建议，2:强制|
-|popTimes|升级提醒次数|int|0|
-|popInterval|升级提醒间隔|int|0|
-|versionCode|版本号|int|0|
-|versionName|版本名|String|""|
-|apkUrl|apk下载链接|String|null|
-|fileSize|apk文件大小|long|0|
 
 ## 感谢
 [bugly文档](https://bugly.qq.com/docs/)
