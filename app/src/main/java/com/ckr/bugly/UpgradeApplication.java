@@ -20,15 +20,15 @@ import com.tencent.tinker.loader.shareutil.ShareConstants;
 @DefaultLifeCycle(application = "com.ckr.bugly.CkrApplication",
         flags = ShareConstants.TINKER_ENABLE_ALL,
         loadVerifyFlag = false)
-public class MyApplication extends DefaultApplicationLike {
-    private static MyApplication instance;
+public class UpgradeApplication extends DefaultApplicationLike {
+    private static UpgradeApplication instance;
     private static final String BUGLY_ID = "83ffe4ff10";
 
-    public static MyApplication getInstance() {
+    public static UpgradeApplication getInstance() {
         return instance;
     }
 
-    public MyApplication(Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag, long applicationStartElapsedTime, long applicationStartMillisTime, Intent tinkerResultIntent) {
+    public UpgradeApplication(Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag, long applicationStartElapsedTime, long applicationStartMillisTime, Intent tinkerResultIntent) {
         super(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);
     }
 
