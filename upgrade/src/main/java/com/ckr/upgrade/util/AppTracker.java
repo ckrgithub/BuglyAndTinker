@@ -56,9 +56,11 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
                 showDialog(canShow);
             } else {
                 for (Class<? extends Activity> act : UpgradeConfig.canShowUpgradeActs) {
-                    if (act.isInstance(activity)) {
-                        Log.d(TAG, "onActivityResumed: activity:" + activity);
-                        this.activity = activity;
+                    if (act != null) {
+                        if (act.isInstance(activity)) {
+                            Log.d(TAG, "onActivityResumed: activity:" + activity);
+                            this.activity = activity;
+                        }
                     }
                 }
             }
@@ -73,9 +75,11 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
                 this.activity = null;
             } else {
                 for (Class<? extends Activity> act : UpgradeConfig.canShowUpgradeActs) {
-                    if (act.isInstance(activity)) {
-                        Log.d(TAG, "onActivityPaused: activity:" + activity);
-                        this.activity = null;
+                    if (act != null) {
+                        if (act.isInstance(activity)) {
+                            Log.d(TAG, "onActivityPaused: activity:" + activity);
+                            this.activity = null;
+                        }
                     }
                 }
             }
