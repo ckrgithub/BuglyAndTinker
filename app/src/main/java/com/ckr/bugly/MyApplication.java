@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.ckr.upgrade.UpgradeConfig;
+import com.ckr.upgrade.UpgradeManager;
 import com.ckr.upgrade.util.UpgradeLog;
 import com.ckr.walle.ChannelUtil;
 import com.tencent.bugly.beta.Beta;
@@ -50,7 +51,7 @@ public class MyApplication extends DefaultApplicationLike {
         UpgradeConfig.canShowUpgradeActs.add(MainActivity.class);
         UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplication().getApplicationContext()), R.mipmap.ic_launcher);
         //升级功能配置
-        UpgradeConfig.init(getApplication(), upgradeConfig);
+        UpgradeManager.init(getApplication(), upgradeConfig);
     }
 
 
