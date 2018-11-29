@@ -25,7 +25,7 @@ def getRFileName() {
 }
 
 def getTinkerIdValue() {
-    return "patch-${getVersion()}"
+    return "app-${getVersion()}"
 }
 
 tinkerSupport {
