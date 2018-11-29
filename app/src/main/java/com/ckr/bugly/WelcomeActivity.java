@@ -8,12 +8,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.ckr.bugly.permission.PermissionManager;
+import com.ckr.bugly.util.UpgradeUtil;
 import com.tencent.bugly.beta.Beta;
 
 public class WelcomeActivity extends BaseActivity {
-    public static final int TYPE_BUGLY = 0;
-    public static final int TYPE_OFFICIAL = 1;
-    private int upgradeType = TYPE_BUGLY;
     private static final boolean noRequestPermission = true;
 
 
@@ -58,12 +56,6 @@ public class WelcomeActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (upgradeType == TYPE_BUGLY) {
-            //isManual  用户手动点击检查，非用户点击操作请传false
-            //isSilence 是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
-            Beta.checkUpgrade(false, false);
-        } else if (upgradeType == TYPE_OFFICIAL) {
-
-        }
+        UpgradeUtil.checkUpgrade("http://www.baidu.com");
     }
 }
