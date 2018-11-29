@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.ckr.bugly.permission.PermissionManager;
 import com.ckr.bugly.util.UpgradeUtil;
-import com.tencent.bugly.beta.Beta;
 
 public class WelcomeActivity extends BaseActivity {
     private static final boolean noRequestPermission = true;
@@ -56,6 +55,6 @@ public class WelcomeActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        UpgradeUtil.checkUpgrade("http://www.baidu.com");
+        UpgradeUtil.checkUpgrade("https://github.com/ckrgithub");
     }
 }
