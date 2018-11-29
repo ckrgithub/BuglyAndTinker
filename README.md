@@ -110,9 +110,9 @@ App全量更新和热更新
   }
 ```
 步骤二.生成补丁包
-[基准包生成](img/tinker_1.png)  
-[补丁包生成](img/tinker_2.png)  
-[补丁包上传](img/tinker_3.png)
+![基准包生成](img/tinker_1.png)  
+![补丁包生成](img/tinker_2.png)  
+![补丁包上传](img/tinker_3.png)
 
 
 ## 感谢
