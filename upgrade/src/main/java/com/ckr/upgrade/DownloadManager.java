@@ -48,7 +48,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class DownloadManager implements Runnable {
     private static final String TAG = "DownloadManager";
-    public static final String DOWNLOAD_PROGRESS = "download_progress";
+    public static final String DOWNLOAD_STATUS = "download_progress";
     public static final String APK_URL = "apk_url";
     public final static int INIT = 0;
     public final static int COMPLETE = 1;
@@ -255,7 +255,7 @@ public class DownloadManager implements Runnable {
     private PendingIntent getPendingIntent(int downloadStatus) {
         Intent intent = new Intent();
         intent.setAction(DownloadReceiver.APK_DOWNLOAD_RECEIVER);
-        intent.putExtra(DOWNLOAD_PROGRESS, downloadStatus);
+        intent.putExtra(DOWNLOAD_STATUS, downloadStatus);
         if (mUpgradeInfo != null) {
             String apkUrl = mUpgradeInfo.apkUrl;
             intent.putExtra(APK_URL, ApkUtil.getApkPath(apkUrl, mContext));

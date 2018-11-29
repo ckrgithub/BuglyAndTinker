@@ -10,7 +10,7 @@ import com.ckr.upgrade.util.UpgradeLog;
 import static com.ckr.upgrade.DownloadManager.APK_URL;
 import static com.ckr.upgrade.DownloadManager.COMPLETE;
 import static com.ckr.upgrade.DownloadManager.DOWNLOADING;
-import static com.ckr.upgrade.DownloadManager.DOWNLOAD_PROGRESS;
+import static com.ckr.upgrade.DownloadManager.DOWNLOAD_STATUS;
 import static com.ckr.upgrade.DownloadManager.FAILED;
 import static com.ckr.upgrade.DownloadManager.INIT;
 import static com.ckr.upgrade.DownloadManager.PAUSED;
@@ -30,7 +30,7 @@ public class DownloadReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		UpgradeLog.Logd(TAG, "onReceive: " + this);
 		if (intent != null) {
-			int status = intent.getIntExtra(DOWNLOAD_PROGRESS, INIT);
+			int status = intent.getIntExtra(DOWNLOAD_STATUS, INIT);
 			String url = intent.getStringExtra(APK_URL);
 			UpgradeLog.Logd(TAG, "onReceive: status:" + status + ",url:" + url);
 			switch (status) {
