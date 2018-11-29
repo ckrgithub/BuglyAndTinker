@@ -56,6 +56,7 @@ App全量更新和热更新
 [tinker_support.gradle在这](app/tinker_support.gradle)
 ### 3.属性说明
 * 升级配置  
+
 |属性|描述|类型|默认值|
 |---|---|---|---|
 |smallIconId|通知栏小图标资源id|int|-1|
@@ -63,7 +64,9 @@ App全量更新和热更新
 |enableNotification|是否发送通知|boolean|true|
 |enableWriteChannelInfo|是否写入渠道|boolean|true|
 |canShowUpgradeActs|可以显示升级框的场景|List<Class<? extends Activity>>|无|
+
 * 升级信息
+
 |属性|描述|类型|默认值|
 |---|---|---|---|
 |title|升级标题|String|""|
