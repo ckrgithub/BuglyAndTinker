@@ -65,7 +65,7 @@ public class UpgradeManager {
 //        Beta.canShowUpgradeActs.add(MainActivity.class);//添加可显示弹窗的Activity
         Beta.enableNotification = true;//设置是否显示消息通知
         Beta.autoDownloadOnWifi = false;//设置wifi下自动下载
-        Beta.enableHotfix = true;//设置开启热更新
+        Beta.enableHotfix = false;//设置开启热更新
 //      </editor-fold>
 
         Beta.upgradeListener = new ApkUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听

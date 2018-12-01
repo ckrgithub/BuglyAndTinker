@@ -7,7 +7,7 @@ publish {
     userOrg = 'ckrjfrog'
     groupId = 'ckrjfrog.Upgrade'
     artifactId = 'AppUpgrade'
-    publishVersion = upgradeConfig.publishVersion
+    publishVersion = rootProject.upgradeConfig.publishVersion
     desc = 'app升级功能'
     website = siteUrl
 }
@@ -44,10 +44,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly applyConfig.appcompat_v7
     compileOnly applyConfig.support_v4
     implementation applyConfig.constraint_layout
-    api project(':walle')
     compileOnly applyConfig.bugly_crashreport
     compileOnly applyConfig.bugly_nativecrashreport
     compileOnly applyConfig.okhttp
