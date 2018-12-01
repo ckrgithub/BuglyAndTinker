@@ -51,7 +51,7 @@ public class UpgradeApplication extends DefaultApplicationLike {
         UpgradeConfig.canShowUpgradeActs.add(MainActivity.class);
         UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplication().getApplicationContext()), R.mipmap.ic_launcher);
         //升级功能配置
-        UpgradeManager.init(getApplication(), upgradeConfig);
+        UpgradeManager.init(getApplication(), upgradeConfig,true);
     }
 
 

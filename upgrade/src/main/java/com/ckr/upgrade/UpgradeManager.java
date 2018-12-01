@@ -28,8 +28,9 @@ public class UpgradeManager {
      * 应用升级和异常上报
      *
      * @param application
+     * @param b
      */
-    public static void init(@NonNull Application application, @NonNull UpgradeConfig config) {
+    public static void init(@NonNull Application application, @NonNull UpgradeConfig config, boolean enableHotfix) {
         long startTime = System.currentTimeMillis();
         UpgradeLog.Logd(TAG, "init: startTime:" + startTime);
         UpgradeConfig.smallIconId = config.notificationIconId;
@@ -65,7 +66,7 @@ public class UpgradeManager {
 //        Beta.canShowUpgradeActs.add(MainActivity.class);//添加可显示弹窗的Activity
         Beta.enableNotification = true;//设置是否显示消息通知
         Beta.autoDownloadOnWifi = false;//设置wifi下自动下载
-        Beta.enableHotfix = false;//设置开启热更新
+        Beta.enableHotfix = enableHotfix;//设置开启热更新
 //      </editor-fold>
 
         Beta.upgradeListener = new ApkUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听
