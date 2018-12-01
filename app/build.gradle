@@ -54,8 +54,5 @@ dependencies {
     implementation applyConfig.bugly_crashreport
     implementation applyConfig.bugly_nativecrashreport
     implementation applyConfig.okhttp
-    implementation applyConfig.jackson_databind
-    implementation applyConfig.jackson_annotations
-    implementation applyConfig.jackson_core
     implementation project(':upgrade')
 }
