@@ -1,1 +1,1 @@
-include ':app', ':walle', ':upgrade'
+include ':app', ':upgrade'
