@@ -14,7 +14,6 @@ import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.upgrade.util.ApkUtil;
 import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.tinker.TinkerManager;
 
 import java.io.File;
 
@@ -48,10 +47,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         setOnClickListener(R.id.btnDownload);
         setOnClickListener(R.id.btnPause);
 
-        versionView.append(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
-        String tinkerId = TinkerManager.getTinkerId();
-        Logd(TAG, "onCreate: tinkerId:" + tinkerId);
-        tinkerIdView.append(tinkerId);
+//        versionView.append(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
+//        String tinkerId = TinkerManager.getTinkerId();
+//        Logd(TAG, "onCreate: tinkerId:" + tinkerId);
+//        tinkerIdView.append(tinkerId);
     }
 
     private void setOnClickListener(@IdRes int viewId) {
