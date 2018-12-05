@@ -16,10 +16,10 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ckr.upgrade.listener.OnDownloadListener;
 import com.ckr.upgrade.listener.OnInstallApkListener;
+import com.ckr.upgrade.receiver.DownloadReceiver;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.OkHttpFactory;
 import com.ckr.upgrade.util.UpgradeLog;

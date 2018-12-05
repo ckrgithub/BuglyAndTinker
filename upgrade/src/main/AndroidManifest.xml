@@ -21,7 +21,7 @@
         </provider>
 
         <receiver
-            android:name=".DownloadReceiver"
+            android:name=".receiver.DownloadReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="apk_download_receiver" />
