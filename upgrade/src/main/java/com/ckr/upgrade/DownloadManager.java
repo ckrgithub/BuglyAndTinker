@@ -324,7 +324,7 @@ public class DownloadManager implements Runnable {
                 Call call = OkHttpFactory.createOkHttp().newCall(request);
                 try {
                     Response response = call.execute();
-                    writeApk(response, apkFile, contentLen, startLen);
+                    writeApk(response, apkFile, contentLen, startLen,!isNeedDelete);
                 } catch (IOException e) {
                     e.printStackTrace();
                     UpgradeLog.Loge(TAG, "downloadApk: e:" + e.getMessage());
@@ -365,7 +365,7 @@ public class DownloadManager implements Runnable {
             if (TextUtils.isEmpty(saveApkUrl) || saveApkUrl.equals(apkUrl)) {
 
             } else {
-                final String path = ApkUtil.getApkPath(apkUrl, context);
+                final String path = ApkUtil.getApkPath(saveApkUrl, context);
                 final File file = new File(path);
                 if (file.exists()) {
                     file.delete();
@@ -439,20 +439,20 @@ public class DownloadManager implements Runnable {
 
     /**
      * 写入apk文件
-     *
-     * @param response
+     *  @param response
      * @param apkFile
      * @param contentLen
      * @param startLen
+     * @param isAppend
      */
-    private void writeApk(Response response, File apkFile, long contentLen, long startLen) {
+    private void writeApk(Response response, File apkFile, long contentLen, long startLen, boolean isAppend) {
         long downloadLen = startLen;
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
         boolean isComplete = false;
         try {
             inputStream = response.body().byteStream();
-            outputStream = new FileOutputStream(apkFile, true);
+            outputStream = new FileOutputStream(apkFile, isAppend);
             byte[] buffer = new byte[2048];
             int len = 0;
             while ((len = inputStream.read(buffer)) > 0) {
