@@ -1,9 +1,10 @@
-package com.ckr.upgrade;
+package com.ckr.upgrade.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.ckr.upgrade.DownloadManager;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.UpgradeLog;
 
