@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,6 +16,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ckr.upgrade.listener.OnDownloadListener;
 import com.ckr.upgrade.listener.OnInstallApkListener;
@@ -41,6 +43,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 /**
  * Created by ckr on 2018/11/13.
@@ -49,6 +52,10 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class DownloadManager implements Runnable {
     private static final String TAG = "DownloadManager";
     public static final String DOWNLOAD_STATUS = "download_progress";
+    public static final String FILE_NAME = "UpgradeInfo";
+    public static final String ARG_APK_URL = "apkUrl";
+    public static final String ARG_VERSION_NAME = "versionName";
+    public static final String ARG_VERSION_CODE = "versionCode";
     public static final String APK_URL = "apk_url";
     public final static int INIT = 0;
     public final static int COMPLETE = 1;
@@ -154,7 +161,7 @@ public class DownloadManager implements Runnable {
      * 释放资源
      */
     public void release() {
-        UpgradeLog.Logd(TAG, "release: ");
+        Logd(TAG, "release: ");
         mNotificationManager = null;
         mUpgradeInfo = null;
         mBuilder = null;
@@ -169,11 +176,11 @@ public class DownloadManager implements Runnable {
      * 停止下载
      */
     public void pauseDownload() {
-        UpgradeLog.Logd(TAG, "pauseDownload: ");
+        Logd(TAG, "pauseDownload: ");
         if (mFuture != null) {
             boolean isPause = mFuture.cancel(true);
             mFuture = null;
-            UpgradeLog.Logd(TAG, "pauseDownload: isPause:" + isPause);
+            Logd(TAG, "pauseDownload: isPause:" + isPause);
         }
     }
 
@@ -181,7 +188,7 @@ public class DownloadManager implements Runnable {
      * 继续下载
      */
     public void resumeDownload() {
-        UpgradeLog.Logd(TAG, "resumeDownload: mDownloadStatus:" + mDownloadStatus);
+        Logd(TAG, "resumeDownload: mDownloadStatus:" + mDownloadStatus);
         if (mDownloadStatus != PAUSED) {
             return;
         }
@@ -196,7 +203,7 @@ public class DownloadManager implements Runnable {
         if (mUpgradeInfo == null) {
             throw new NullPointerException("mUpgradeInfo is null");
         }
-        UpgradeLog.Logd(TAG, "startDownload: mDownloadStatus:" + mDownloadStatus);
+        Logd(TAG, "startDownload: mDownloadStatus:" + mDownloadStatus);
         if (mDownloadStatus == DownloadManager.DOWNLOADING) {
             return;
         }
@@ -211,7 +218,7 @@ public class DownloadManager implements Runnable {
      * 发送通知
      */
     public void sendNotification() {
-        UpgradeLog.Logd(TAG, "sendNotification: ");
+        Logd(TAG, "sendNotification: ");
         mNotificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
         String channelId = getString(R.string.notification_channel_id);
         // 8.0适配
@@ -273,14 +280,14 @@ public class DownloadManager implements Runnable {
         }
         if (mFuture != null) {
             boolean cancel = mFuture.cancel(true);
-            UpgradeLog.Logd(TAG, "submit: cancel:" + cancel);
+            Logd(TAG, "submit: cancel:" + cancel);
         }
         mFuture = mExecutor.submit(this);
     }
 
     @Override
     public void run() {
-        UpgradeLog.Logd(TAG, "run: ");
+        Logd(TAG, "run: ");
         if (UpgradeConfig.enableNotification) {
             if (mDownloadStatus != RESUMED && mDownloadStatus != DOWNLOADING) {
                 sendNotification();
@@ -293,17 +300,19 @@ public class DownloadManager implements Runnable {
      * 下载apk
      */
     private void downloadApk() {
-        UpgradeLog.Logd(TAG, "downloadApk: ");
+        Logd(TAG, "downloadApk: ");
         if (mUpgradeInfo != null) {
             String apkUrl = mUpgradeInfo.apkUrl;
             String apkName = ApkUtil.getApkName(apkUrl);
-            UpgradeLog.Logd(TAG, "downloadApk: apkName:" + apkName);
+            Logd(TAG, "downloadApk: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
+                boolean isNeedDelete = isNeedDelete(mContext, apkUrl, mUpgradeInfo.versionName, mUpgradeInfo.versionCode);
+                Logd(TAG, "downloadApk: isNeedDelete:"+isNeedDelete);
                 final String path = ApkUtil.getApkPath(apkUrl, mContext);
                 final File apkFile = new File(path);
-                long startLen = apkFile.length();
+                long startLen = isNeedDelete ? 0 : apkFile.length();
                 long contentLen = mUpgradeInfo.fileSize;
-                UpgradeLog.Logd(TAG, "downloadApk: contentLen:" + contentLen + ",startLen:" + startLen);
+                Logd(TAG, "downloadApk: contentLen:" + contentLen + ",startLen:" + startLen);
                 if (contentLen == startLen) {
                     sendCompleteMsg(path);
                     return;
@@ -335,13 +344,44 @@ public class DownloadManager implements Runnable {
         }
     }
 
+    private static boolean isNeedDelete(@NonNull Context context, String apkUrl, String versionName, int versionCode) {
+        Logd(TAG, "isNeedDelete: ");
+        SharedPreferences preferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        String saveApkUrl = preferences.getString(APK_URL, null);
+        String saveVersionName = preferences.getString(ARG_VERSION_NAME, null);
+        int saveVersionCode = preferences.getInt(ARG_VERSION_CODE, -1);
+        boolean isNeedDelete = false;
+        if (!TextUtils.isEmpty(saveVersionName) && saveVersionName.equals(versionName)) {
+            isNeedDelete = true;
+        } else if (saveVersionCode != versionCode) {
+            isNeedDelete = true;
+        }
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putString(ARG_APK_URL, apkUrl);
+        if (isNeedDelete) {
+            edit.putString(ARG_VERSION_NAME, versionName);
+            edit.putInt(ARG_VERSION_CODE, versionCode);
+            if (TextUtils.isEmpty(saveApkUrl)||saveApkUrl.equals(apkUrl)) {
+
+            }else {
+                final String path = ApkUtil.getApkPath(apkUrl, context);
+                final File file = new File(path);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+        }
+        edit.apply();
+        return isNeedDelete;
+    }
+
     /**
      * 发送下载完成消息
      *
      * @param path apk路径
      */
     private void sendCompleteMsg(String path) {
-        UpgradeLog.Logd(TAG, "sendCompleteMsg: path:" + path + ",mHandler:" + mHandler);
+        Logd(TAG, "sendCompleteMsg: path:" + path + ",mHandler:" + mHandler);
         if (mHandler != null) {
             Message message = mHandler.obtainMessage();
             message.what = COMPLETE;
@@ -356,7 +396,7 @@ public class DownloadManager implements Runnable {
      * @param e 异常对象
      */
     private void sendFailureMsg(IOException e) {
-        UpgradeLog.Logd(TAG, "sendFailureMsg: e:" + e.getMessage() + ",mHandler:" + mHandler);
+        Logd(TAG, "sendFailureMsg: e:" + e.getMessage() + ",mHandler:" + mHandler);
         if (mHandler != null) {
             Message message = mHandler.obtainMessage();
             message.what = FAILED;
@@ -369,7 +409,7 @@ public class DownloadManager implements Runnable {
      * 发送暂停下载消息
      */
     private void sendPauseMsg() {
-        UpgradeLog.Logd(TAG, "sendPauseMsg  mHandler:" + mHandler);
+        Logd(TAG, "sendPauseMsg  mHandler:" + mHandler);
         if (mHandler != null) {
             Message message = mHandler.obtainMessage();
             message.what = PAUSED;
@@ -385,7 +425,7 @@ public class DownloadManager implements Runnable {
      * @param progress
      */
     private void sendProgressMsg(int contentLen, int downloadLen, int progress) {
-        UpgradeLog.Logd(TAG, "sendProgressMsg: contentLen:" + contentLen + ",downloadLen:" + downloadLen + "sendProgressMsg: progress:" + progress + ",mHandler:" + mHandler);
+        Logd(TAG, "sendProgressMsg: contentLen:" + contentLen + ",downloadLen:" + downloadLen + "sendProgressMsg: progress:" + progress + ",mHandler:" + mHandler);
         if (mHandler != null) {
             Message message = mHandler.obtainMessage();
             message.what = DOWNLOADING;
@@ -418,7 +458,7 @@ public class DownloadManager implements Runnable {
                 outputStream.write(buffer, 0, len);
                 downloadLen += len;
                 int progress = (int) (downloadLen * MAX_PROGRESS / contentLen);
-                UpgradeLog.Logd(TAG, "writeApk: progress:" + progress);
+                Logd(TAG, "writeApk: progress:" + progress);
                 if (progress < MAX_PROGRESS) {
                     updateProgress(mDownloadStatus, progress);
                     sendProgressMsg((int) contentLen, (int) startLen, progress);
@@ -462,10 +502,10 @@ public class DownloadManager implements Runnable {
         @Override
         public void handleMessage(Message msg) {
             int what = msg.what;
-            UpgradeLog.Logd(TAG, "handleMessage: what:" + what);
+            Logd(TAG, "handleMessage: what:" + what);
             switch (what) {
                 case DOWNLOADING:
-                    UpgradeLog.Logd(TAG, "handleMessage: DOWNLOADING");
+                    Logd(TAG, "handleMessage: DOWNLOADING");
                     mDownloadStatus = DOWNLOADING;
                     Object obj = msg.obj;
                     if (obj instanceof Integer) {
@@ -482,7 +522,7 @@ public class DownloadManager implements Runnable {
                     }
                     break;
                 case FAILED:
-                    UpgradeLog.Logd(TAG, "handleMessage: FAILED");
+                    Logd(TAG, "handleMessage: FAILED");
                     mDownloadStatus = FAILED;
                     onFailure();
                     obj = msg.obj;
@@ -497,7 +537,7 @@ public class DownloadManager implements Runnable {
                     }
                     break;
                 case COMPLETE:
-                    UpgradeLog.Logd(TAG, "handleMessage: COMPLETE");
+                    Logd(TAG, "handleMessage: COMPLETE");
                     mDownloadStatus = COMPLETE;
                     onComplete();
                     obj = msg.obj;
@@ -533,7 +573,7 @@ public class DownloadManager implements Runnable {
      * 下载暂停处理
      */
     private void onPause() {
-        UpgradeLog.Logd(TAG, "onPause: ");
+        Logd(TAG, "onPause: ");
         mBuilder.setContentText(getString(R.string.notification_status_pause));
         mBuilder.setContentIntent(getPendingIntent(PAUSED));
         Notification notification = mBuilder.build();
@@ -544,7 +584,7 @@ public class DownloadManager implements Runnable {
      * 下载失败处理
      */
     private void onFailure() {
-        UpgradeLog.Logd(TAG, "onFailure: ");
+        Logd(TAG, "onFailure: ");
         if (mBuilder != null) {
             mBuilder.setContentText(getString(R.string.download_status_failed));
             mBuilder.setContentIntent(getPendingIntent(FAILED));
@@ -557,7 +597,7 @@ public class DownloadManager implements Runnable {
      * 下载完成处理
      */
     private void onComplete() {
-        UpgradeLog.Logd(TAG, "onComplete: ");
+        Logd(TAG, "onComplete: ");
         if (mBuilder != null) {
             mNotificationManager.cancel(NOTIFY_ID);
         }
@@ -570,7 +610,7 @@ public class DownloadManager implements Runnable {
      * @param progress
      */
     private void updateProgress(int mStatus, int progress) {
-        UpgradeLog.Logd(TAG, "updateProgress: mDownloadStatus:" + mStatus + ",progress:" + progress);
+        Logd(TAG, "updateProgress: mDownloadStatus:" + mStatus + ",progress:" + progress);
         if (mBuilder != null) {
             mBuilder.setProgress(MAX_PROGRESS, progress, false);
             mBuilder.setContentInfo(progress + getString(R.string.upgrade_progress_symbol));
