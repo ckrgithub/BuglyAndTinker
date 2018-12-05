@@ -22,6 +22,7 @@ import java.io.File;
 
 public class ApkUtil {
     private static final String TAG = "ApkUtil";
+    private static final String APK_DIRECTORY = "apk";
     public static final int REQUEST_CODE_INSTALL = 1129;
 
     /**
@@ -52,7 +53,12 @@ public class ApkUtil {
         if (TextUtils.isEmpty(apkName)) {
             return null;
         }
-        return context.getExternalFilesDir(null).getAbsolutePath() + File.separator + apkName;
+        String path = context.getExternalFilesDir(null).getAbsolutePath() + File.separator + APK_DIRECTORY;
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return path + File.separator + apkName;
     }
 
     /**
