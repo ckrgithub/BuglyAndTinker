@@ -3,13 +3,13 @@
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
             <corners android:bottomLeftRadius="@dimen/dialog_background_radius"/>
-            <solid android:color="@color/dialog_btn_press_color"></solid>
+            <solid android:color="@color/dialog_btn_negative_press_color"></solid>
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
             <corners android:bottomLeftRadius="@dimen/dialog_background_radius"/>
-            <solid android:color="@color/dialog_btn_normal_color"></solid>
+            <solid android:color="@color/dialog_btn_negative_normal_color"></solid>
         </shape>
     </item>
 </selector>

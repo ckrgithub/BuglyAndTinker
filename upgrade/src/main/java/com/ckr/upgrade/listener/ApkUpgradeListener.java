@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ckr.upgrade.DownloadManager;
+import com.ckr.upgrade.UpgradeManager;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.AppTracker;
 import com.ckr.upgrade.util.UpgradeLog;
@@ -22,13 +23,10 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
 public class ApkUpgradeListener implements UpgradeListener, Runnable {
     private static final String TAG = "ApkUpgradeListener";
-    private static final String KEY_POP_TIMES = "popTimes";
-    private static final String KEY_POP_INTERVAL = "popInterval";
-    private final AppTracker appTracker;
+
     private final Context context;
 
-    public ApkUpgradeListener(@NonNull AppTracker appTracker, @NonNull Context context) {
-        this.appTracker = appTracker;
+    public ApkUpgradeListener(@NonNull Context context) {
         this.context = context;
     }
 
@@ -36,7 +34,6 @@ public class ApkUpgradeListener implements UpgradeListener, Runnable {
     public void onUpgrade(int i, UpgradeInfo upgradeInfo, boolean b, boolean b1) {
         Logd(TAG, "onUpgrade: i" + i + ",b:" + b + ",b1:" + b1 + ",upgradeInfo:" + upgradeInfo);
         if (upgradeInfo != null) {
-            if (interceptPop(upgradeInfo)) return;
             com.ckr.upgrade.UpgradeInfo info = new com.ckr.upgrade.UpgradeInfo();
             info.title = upgradeInfo.title;
             info.newFeature = upgradeInfo.newFeature;
@@ -54,55 +51,11 @@ public class ApkUpgradeListener implements UpgradeListener, Runnable {
         }
     }
 
-    private boolean interceptPop(UpgradeInfo upgradeInfo) {
-        int popTimes = upgradeInfo.popTimes;
-        long popInterval = upgradeInfo.popInterval;
-        String apkUrl = upgradeInfo.apkUrl;
-        if (context != null) {
-            String fileName = ApkUtil.getApkName(apkUrl);
-            if (!TextUtils.isEmpty(fileName)) {
-                SharedPreferences preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
-                boolean isStartPopConfig = false;
-                if (popTimes > 0 && popTimes != Integer.MAX_VALUE) {
-                    int savePopTimes = preferences.getInt(KEY_POP_TIMES, 0);
-                    Logd(TAG, "interceptPop: savePopTimes:" + savePopTimes + ",popTime:" + popTimes);
-                    if (popTimes <= savePopTimes) {
-                        return true;
-                    } else {
-                        isStartPopConfig = true;
-                    }
-                }
-                if (popInterval > 0) {
-                    long currentTimeMillis = System.currentTimeMillis();
-                    long savePopInterval = preferences.getLong(KEY_POP_INTERVAL, currentTimeMillis);
-                    Logd(TAG, "interceptPop: savePopInterval:" + savePopInterval + ",popInterval:" + popInterval + ",currentTimeMillis:" + currentTimeMillis);
-                    if ((savePopInterval + popInterval) < currentTimeMillis) {
-                        return true;
-                    } else {
-                        isStartPopConfig = true;
-                    }
-                }
-                if (isStartPopConfig) {
-                    SharedPreferences.Editor edit = preferences.edit();
-                    if (popTimes > 0) {
-                        int savePopTimes = preferences.getInt(KEY_POP_TIMES, 0);
-                        edit.putInt(KEY_POP_TIMES, savePopTimes + 1);
-                    }
-                    if (popInterval > 0) {
-                        edit.putLong(KEY_POP_INTERVAL, System.currentTimeMillis());
-                    }
-                    edit.apply();
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     public void run() {
         UpgradeLog.Loge(TAG, "run: 需要更新，存在更新策略");
-        if (appTracker != null) {
-            appTracker.showDialog(true);
+        if (UpgradeManager.appTracker != null) {
+            UpgradeManager.appTracker.showDialog(true);
         }
     }
 }

@@ -23,18 +23,20 @@ import java.io.IOException;
 
 public class UpgradeManager {
     private static final String TAG = "UpgradeManager";
+    public static AppTracker appTracker;
 
     /**
      * 应用升级和异常上报
      *
      * @param application
-     * @param b
+     * @param config
+     * @param enableHotfix
      */
     public static void init(@NonNull Application application, @NonNull UpgradeConfig config, boolean enableHotfix) {
         long startTime = System.currentTimeMillis();
         UpgradeLog.Logd(TAG, "init: startTime:" + startTime);
         UpgradeConfig.smallIconId = config.notificationIconId;
-        AppTracker appTracker = new AppTracker();
+        appTracker = new AppTracker();
         application.registerActivityLifecycleCallbacks(appTracker);
 
         Context context = application.getApplicationContext();
@@ -69,7 +71,7 @@ public class UpgradeManager {
         Beta.enableHotfix = enableHotfix;//设置开启热更新
 //      </editor-fold>
 
-        Beta.upgradeListener = new ApkUpgradeListener(appTracker, application.getApplicationContext());//app更新策略监听
+        Beta.upgradeListener = new ApkUpgradeListener(application.getApplicationContext());//app更新策略监听
         //初始化统一接口
         Bugly.init(context, config.buglyId, UpgradeConfig.isDebug, strategy);
         UpgradeLog.Logd(TAG, "init: usedTime:" + (System.currentTimeMillis() - startTime));
