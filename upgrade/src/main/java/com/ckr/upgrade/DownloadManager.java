@@ -307,7 +307,7 @@ public class DownloadManager implements Runnable {
             Logd(TAG, "downloadApk: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
                 boolean isNeedDelete = isNeedDelete(mContext, apkUrl, mUpgradeInfo.versionName, mUpgradeInfo.versionCode);
-                Logd(TAG, "downloadApk: isNeedDelete:"+isNeedDelete);
+                Logd(TAG, "downloadApk: isNeedDelete:" + isNeedDelete);
                 final String path = ApkUtil.getApkPath(apkUrl, mContext);
                 final File apkFile = new File(path);
                 long startLen = isNeedDelete ? 0 : apkFile.length();
@@ -345,13 +345,14 @@ public class DownloadManager implements Runnable {
     }
 
     private static boolean isNeedDelete(@NonNull Context context, String apkUrl, String versionName, int versionCode) {
-        Logd(TAG, "isNeedDelete: ");
+        Logd(TAG, "isNeedDelete: versionName:" + versionName + ",versionCode:" + versionCode + ",apkUrl:" + apkUrl);
         SharedPreferences preferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         String saveApkUrl = preferences.getString(APK_URL, null);
         String saveVersionName = preferences.getString(ARG_VERSION_NAME, null);
         int saveVersionCode = preferences.getInt(ARG_VERSION_CODE, -1);
         boolean isNeedDelete = false;
-        if (!TextUtils.isEmpty(saveVersionName) && saveVersionName.equals(versionName)) {
+        Logd(TAG, "isNeedDelete: saveVersionName:" + saveVersionName + ",saveVersionCode:" + saveVersionCode + ",saveApkUrl:" + saveApkUrl);
+        if (!TextUtils.isEmpty(saveVersionName) && !saveVersionName.equals(versionName)) {
             isNeedDelete = true;
         } else if (saveVersionCode != versionCode) {
             isNeedDelete = true;
@@ -361,9 +362,9 @@ public class DownloadManager implements Runnable {
         if (isNeedDelete) {
             edit.putString(ARG_VERSION_NAME, versionName);
             edit.putInt(ARG_VERSION_CODE, versionCode);
-            if (TextUtils.isEmpty(saveApkUrl)||saveApkUrl.equals(apkUrl)) {
+            if (TextUtils.isEmpty(saveApkUrl) || saveApkUrl.equals(apkUrl)) {
 
-            }else {
+            } else {
                 final String path = ApkUtil.getApkPath(apkUrl, context);
                 final File file = new File(path);
                 if (file.exists()) {
