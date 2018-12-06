@@ -16,6 +16,8 @@ import com.ckr.upgrade.listener.OnInstallApkListener;
 
 import java.io.File;
 
+import static com.ckr.upgrade.util.UpgradeLog.Logd;
+
 /**
  * Created by ckr on 2018/11/12.
  */
@@ -53,7 +55,7 @@ public class ApkUtil {
         if (TextUtils.isEmpty(apkName)) {
             return null;
         }
-        String path = context.getExternalFilesDir(null).getAbsolutePath() + File.separator + APK_DIRECTORY;
+        String path = getApkDirectory(context);
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -62,12 +64,62 @@ public class ApkUtil {
     }
 
     /**
+     * apk存放的目录路径
+     *
+     * @param context
+     * @return
+     */
+    @NonNull
+    public static String getApkDirectory(@NonNull Context context) {
+        return context.getExternalFilesDir(null).getAbsolutePath() + File.separator + APK_DIRECTORY;
+    }
+
+    /**
+     * 删除apk
+     *
+     * @param context
+     * @return
+     */
+    public static boolean clearApk(@NonNull Context context) {
+        String apkDirectory = getApkDirectory(context);
+        return deleteFile(apkDirectory);
+    }
+
+    /**
+     * 删除该目录下所有文件
+     *
+     * @param path
+     * @return
+     */
+    private static boolean deleteFile(String path) {
+        Logd(TAG, "deleteFile: path:" + path);
+        File directory = new File(path);
+        if (!directory.exists()) {
+            return false;
+        }
+        if (!directory.isDirectory()) {
+            return false;
+        }
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteFile(file.getAbsolutePath());
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * 安装apk
      *
      * @param path apk路径
      */
     public static boolean installApk(String path, @NonNull Context context) {
-        UpgradeLog.Logd(TAG, "installApk: path:" + path);
+        Logd(TAG, "installApk: path:" + path);
         File apkFile = new File(path);
         if (!apkFile.exists()) {
             return false;
@@ -86,14 +138,14 @@ public class ApkUtil {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             Uri uri = parUri(apkFile, context);
-            UpgradeLog.Logd(TAG, "installApk: uri:" + uri);
+            Logd(TAG, "installApk: uri:" + uri);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             return true;
         } catch (Exception e) {
-            UpgradeLog.Logd(TAG, "installApk: exception");
+            Logd(TAG, "installApk: exception");
             e.printStackTrace();
         }
         return false;
