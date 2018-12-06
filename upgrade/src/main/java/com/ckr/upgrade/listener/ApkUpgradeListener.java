@@ -54,8 +54,9 @@ public class ApkUpgradeListener implements UpgradeListener, Runnable {
     @Override
     public void run() {
         UpgradeLog.Loge(TAG, "run: 需要更新，存在更新策略");
-        if (UpgradeManager.appTracker != null) {
-            UpgradeManager.appTracker.showDialog(true);
+        AppTracker appTracker = UpgradeManager.getAppTracker();
+        if (appTracker != null) {
+            appTracker.showDialog(true);
         }
     }
 }

@@ -23,7 +23,15 @@ import java.io.IOException;
 
 public class UpgradeManager {
     private static final String TAG = "UpgradeManager";
-    public static AppTracker appTracker;
+    private static AppTracker appTracker;
+
+    public static AppTracker getAppTracker() {
+        return appTracker;
+    }
+
+    public static void release() {
+        appTracker = null;
+    }
 
     /**
      * 应用升级和异常上报
