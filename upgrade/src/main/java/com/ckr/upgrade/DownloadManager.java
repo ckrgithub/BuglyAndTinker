@@ -52,10 +52,10 @@ import static com.ckr.upgrade.util.UpgradeLog.Logd;
 public class DownloadManager implements Runnable {
     private static final String TAG = "DownloadManager";
     public static final String DOWNLOAD_STATUS = "download_progress";
-    public static final String FILE_NAME = "UpgradeInfo";
-    public static final String ARG_APK_URL = "apkUrl";
-    public static final String ARG_VERSION_NAME = "versionName";
-    public static final String ARG_VERSION_CODE = "versionCode";
+    private static final String FILE_NAME = "UpgradeInfo";
+    private static final String ARG_APK_URL = "apkUrl";
+    private static final String ARG_VERSION_NAME = "versionName";
+    private static final String ARG_VERSION_CODE = "versionCode";
     public static final String APK_URL = "apk_url";
     public final static int INIT = 0;
     public final static int COMPLETE = 1;
@@ -306,11 +306,11 @@ public class DownloadManager implements Runnable {
             String apkName = ApkUtil.getApkName(apkUrl);
             Logd(TAG, "downloadApk: apkName:" + apkName);
             if (!TextUtils.isEmpty(apkName)) {
-                boolean isNeedDelete = isNeedDelete(mContext, apkUrl, mUpgradeInfo.versionName, mUpgradeInfo.versionCode);
-                Logd(TAG, "downloadApk: isNeedDelete:" + isNeedDelete);
+                boolean isAppend = isAppend(mContext, apkUrl, mUpgradeInfo.versionName, mUpgradeInfo.versionCode);
+                Logd(TAG, "downloadApk: isAppend:" + isAppend);
                 final String path = ApkUtil.getApkPath(apkUrl, mContext);
                 final File apkFile = new File(path);
-                long startLen = isNeedDelete ? 0 : apkFile.length();
+                long startLen = isAppend ? apkFile.length() : 0;
                 long contentLen = mUpgradeInfo.fileSize;
                 Logd(TAG, "downloadApk: contentLen:" + contentLen + ",startLen:" + startLen);
                 if (contentLen == startLen) {
@@ -324,7 +324,7 @@ public class DownloadManager implements Runnable {
                 Call call = OkHttpFactory.createOkHttp().newCall(request);
                 try {
                     Response response = call.execute();
-                    writeApk(response, apkFile, contentLen, startLen,!isNeedDelete);
+                    writeApk(response, apkFile, contentLen, startLen, isAppend);
                 } catch (IOException e) {
                     e.printStackTrace();
                     UpgradeLog.Loge(TAG, "downloadApk: e:" + e.getMessage());
@@ -344,36 +344,41 @@ public class DownloadManager implements Runnable {
         }
     }
 
-    private static boolean isNeedDelete(@NonNull Context context, String apkUrl, String versionName, int versionCode) {
-        Logd(TAG, "isNeedDelete: versionName:" + versionName + ",versionCode:" + versionCode + ",apkUrl:" + apkUrl);
+    /**
+     * 文件是否以追加模式写入
+     *
+     * @param context
+     * @param apkUrl
+     * @param versionName
+     * @param versionCode
+     * @return
+     */
+    private static boolean isAppend(@NonNull Context context, String apkUrl, String versionName, int versionCode) {
+        Logd(TAG, "isAppend: versionName:" + versionName + ",versionCode:" + versionCode + ",apkUrl:" + apkUrl);
         SharedPreferences preferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         String saveApkUrl = preferences.getString(APK_URL, null);
         String saveVersionName = preferences.getString(ARG_VERSION_NAME, null);
         int saveVersionCode = preferences.getInt(ARG_VERSION_CODE, -1);
-        boolean isNeedDelete = false;
-        Logd(TAG, "isNeedDelete: saveVersionName:" + saveVersionName + ",saveVersionCode:" + saveVersionCode + ",saveApkUrl:" + saveApkUrl);
+        boolean isAppend = true;
+        Logd(TAG, "isAppend: saveVersionName:" + saveVersionName + ",saveVersionCode:" + saveVersionCode + ",saveApkUrl:" + saveApkUrl);
         if (!TextUtils.isEmpty(saveVersionName) && !saveVersionName.equals(versionName)) {
-            isNeedDelete = true;
+            isAppend = false;
         } else if (saveVersionCode != versionCode) {
-            isNeedDelete = true;
+            isAppend = false;
         }
         SharedPreferences.Editor edit = preferences.edit();
         edit.putString(ARG_APK_URL, apkUrl);
-        if (isNeedDelete) {
+        if (!isAppend) {
             edit.putString(ARG_VERSION_NAME, versionName);
             edit.putInt(ARG_VERSION_CODE, versionCode);
             if (TextUtils.isEmpty(saveApkUrl) || saveApkUrl.equals(apkUrl)) {
 
             } else {
-                final String path = ApkUtil.getApkPath(saveApkUrl, context);
-                final File file = new File(path);
-                if (file.exists()) {
-                    file.delete();
-                }
+                ApkUtil.clearApk(context);
             }
         }
         edit.apply();
-        return isNeedDelete;
+        return isAppend;
     }
 
     /**
@@ -439,7 +444,8 @@ public class DownloadManager implements Runnable {
 
     /**
      * 写入apk文件
-     *  @param response
+     *
+     * @param response
      * @param apkFile
      * @param contentLen
      * @param startLen
