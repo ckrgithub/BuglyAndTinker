@@ -54,6 +54,6 @@ dependencies {
     implementation applyConfig.bugly_crashreport
     implementation applyConfig.bugly_nativecrashreport
     implementation applyConfig.okhttp
-    implementation project(':upgrade')
-//    implementation 'ckrjfrog.Upgrade:AppUpgrade:1.0.0'
+//    implementation project(':upgrade')
+    implementation 'ckrjfrog.Upgrade:AppUpgrade:1.0.1'
 }
