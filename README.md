@@ -8,7 +8,7 @@ App全量更新和热更新
 ### 添加依赖：
 ```
   dependencies {
-    implementation 'ckrjfrog.Upgrade:AppUpgrade:1.0.1'
+    implementation 'ckrjfrog.Upgrade:AppUpgrade:1.0.3'
   }
 ```
 
