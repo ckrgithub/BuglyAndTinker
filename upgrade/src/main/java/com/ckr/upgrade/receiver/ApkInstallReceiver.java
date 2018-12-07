@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.ckr.upgrade.util.ApkUtil;
+import com.ckr.upgrade.util.ClearApkService;
 
 import static com.ckr.upgrade.util.UpgradeLog.Logd;
 
@@ -19,9 +20,10 @@ public class ApkInstallReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Logd(TAG, "onReceive: " + intent.getAction());
         String action = intent.getAction();
-        if (action.equals(Intent.ACTION_PACKAGE_ADDED) || action.equals(Intent.ACTION_PACKAGE_REPLACED)) {
+        if (action.equals(Intent.ACTION_PACKAGE_REPLACED)) {
             Logd(TAG, "onReceive: 安装成功");
-            ApkUtil.clearApk(context);
+            Intent clearService = new Intent(context, ClearApkService.class);
+            context.startService(clearService);
         }
     }
 }
