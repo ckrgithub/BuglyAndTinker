@@ -27,13 +27,19 @@
                 <action android:name="apk_download_receiver" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".receiver.ApkInstallReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".util.ClearApkService"
+            android:exported="false">
+        </service>
     </application>
 </manifest>
