@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import com.ckr.upgrade.DownloadManager;
 import com.ckr.upgrade.UpgradeInfo;
 import com.ckr.upgrade.listener.OnInstallApkListener;
 import com.ckr.upgrade.util.ApkUtil;
+import com.ckr.upgrade.util.ClearApkService;
 import com.tencent.bugly.beta.Beta;
 
 import java.io.File;
@@ -46,6 +48,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         setOnClickListener(R.id.btnNotification);
         setOnClickListener(R.id.btnDownload);
         setOnClickListener(R.id.btnPause);
+        setOnClickListener(R.id.btnClear);
 
 //        versionView.append(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
 //        String tinkerId = TinkerManager.getTinkerId();
@@ -148,6 +151,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case R.id.btnPause:
                 DownloadManager.with(this.getApplicationContext()).pauseDownload();
+                break;
+            case R.id.btnClear:
+                Logd(TAG, "onClick: clear");
+                Intent clearService = new Intent(this, ClearApkService.class);
+                startService(clearService);
                 break;
         }
     }
