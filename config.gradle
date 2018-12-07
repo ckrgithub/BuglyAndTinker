@@ -1,7 +1,7 @@
 ext {
     appConfig = [
-            versionCode  : 102,
-            versionName  : "1.0.2",
+            versionCode  : 100,
+            versionName  : "1.0.0",
             applicationId: "com.ckr.bugly",
     ]
 
@@ -12,9 +12,9 @@ ext {
     ]
 
     upgradeConfig = [
-            versionCode   : 102,
-            versionName   : "1.0.2",
-            publishVersion: "1.0.2"
+            versionCode   : 103,
+            versionName   : "1.0.3",
+            publishVersion: "1.0.3"
     ]
 
     supportVersion = "27.1.1"
