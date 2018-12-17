@@ -12,9 +12,9 @@ ext {
     ]
 
     upgradeConfig = [
-            versionCode: 103,
-            versionName: "1.0.3",
-            publishVersion: "1.0.3"
+            versionCode   : 100,
+            versionName   : "1.0.0",
+            publishVersion: "1.0.0"
     ]
 
     supportVersion = "27.1.1"

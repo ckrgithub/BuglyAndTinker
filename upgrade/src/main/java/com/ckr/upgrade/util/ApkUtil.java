@@ -129,9 +129,13 @@ public class ApkUtil {
             canInstall = context.getPackageManager().canRequestPackageInstalls();
         }
         if (!canInstall) {
-            OnInstallApkListener onInstallerListener = DownloadManager.with(context).getOnInstallerListener();
-            if (onInstallerListener != null) {
-                onInstallerListener.requestInstallPermission();
+            if (context instanceof OnInstallApkListener) {
+                ((OnInstallApkListener) context).requestInstallPermission();
+            } else {
+                OnInstallApkListener onInstallerListener = DownloadManager.with(context).getOnInstallerListener();
+                if (onInstallerListener != null) {
+                    onInstallerListener.requestInstallPermission();
+                }
             }
             return false;
         }
