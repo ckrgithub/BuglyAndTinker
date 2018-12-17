@@ -36,12 +36,8 @@ import static com.ckr.upgrade.DownloadManager.PAUSED;
 public class UpgradeDialogFragment extends BaseDialogFragment implements OnDownloadListener {
     private static final String TAG = "BaseDialogFragment";
     protected static final String TYPE_CANCELABLE = "cancelableType";
-    // 建议升级
-    protected static final int STRATEGY_OPTIONAL = 1;
     // 强制升级
     protected static final int STRATEGY_FORCE = 2;
-    // 手工升级
-    protected static final int STRATEGY_MANUAL = 3;
 
     private TextView btnPositive;
     private static OnDialogClickListener onDialogClickListener;

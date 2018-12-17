@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         switch (v.getId()) {
             case R.id.checkUpgrade:
                 Logd(TAG, "onClick: 检查更新");
-                Beta.checkUpgrade(false, false);
+                Beta.checkUpgrade(true, true);
                 break;
             case R.id.btnService:
                 intent = new Intent(this, DownLoadService.class);
