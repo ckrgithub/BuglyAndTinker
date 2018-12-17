@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">upgrade</string>
 
-    <string name="upgrade_default_channel">ckrgithub</string>
 </resources>
