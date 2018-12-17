@@ -16,6 +16,7 @@ public class UpgradeConfig {
     public static boolean isAutoInstall = true;//是否自动安装
     public static boolean enableNotification = true;//是否发送通知
     public static boolean enableWriteChannelInfo = true;//是否写入渠道
+    public static boolean toastWhenNoUpgrade = false;//是否显示toast当不需要更新时
     public static List<Class<? extends Activity>> canShowUpgradeActs = new ArrayList<>(CAPACITY);
 
 

@@ -6,8 +6,11 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.ckr.upgrade.DownloadManager;
+import com.ckr.upgrade.R;
+import com.ckr.upgrade.UpgradeConfig;
 import com.ckr.upgrade.UpgradeManager;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.AppTracker;
@@ -48,6 +51,11 @@ public class ApkUpgradeListener implements UpgradeListener, Runnable {
             new Handler().postDelayed(this, 500);
         } else {
             UpgradeLog.Loge(TAG, "onUpgrade: 不需要更新，没有更新策略");
+            if (UpgradeConfig.toastWhenNoUpgrade) {
+                if (context != null) {
+                    Toast.makeText(context, context.getString(R.string.tips_no_upgrade), Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
