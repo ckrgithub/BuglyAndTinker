@@ -44,7 +44,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly applyConfig.support_v4
+    compileOnly applyConfig.appcompat_v7
     implementation applyConfig.constraint_layout
     compileOnly applyConfig.bugly_crashreport
     compileOnly applyConfig.bugly_nativecrashreport
