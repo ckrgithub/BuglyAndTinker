@@ -20,6 +20,7 @@
     <string name="notification_ticker">更新中</string>
 
     <string name="tips_install_permission">请允许安装未知来源的应用程序</string>
+    <string name="tips_no_upgrade">不需要更新</string>
 
 
     <integer name="time_light_on">1500</integer>
