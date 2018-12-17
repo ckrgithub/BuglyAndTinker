@@ -8,8 +8,7 @@
     </item>
     <item>
         <shape android:shape="rectangle">
-            <corners android:bottomLeftRadius="@dimen/dialog_background_radius"/>
-            <corners android:bottomRightRadius="@dimen/dialog_background_radius"/>
+            <corners android:bottomLeftRadius="@dimen/dialog_background_radius" android:bottomRightRadius="@dimen/dialog_background_radius"/>
             <solid android:color="@color/dialog_btn_positive_normal_color"></solid>
         </shape>
     </item>
