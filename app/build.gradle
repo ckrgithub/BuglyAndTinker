@@ -48,12 +48,10 @@ dependencies {
     implementation applyConfig.appcompat_v7
     implementation applyConfig.support_v4
     implementation applyConfig.constraint_layout
-//    implementation applyConfig.tinker_lib
-//    annotationProcessor(applyConfig.tinker_anno_processor) { changing = true }
-//    compileOnly(applyConfig.tinker_anno) { changing = true }
     implementation applyConfig.bugly_crashreport
     implementation applyConfig.bugly_nativecrashreport
     implementation applyConfig.okhttp
+
 //    implementation project(':upgrade')
     implementation applyConfig.app_upgrade
 }
