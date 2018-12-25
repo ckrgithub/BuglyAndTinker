@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import com.ckr.upgrade.R;
 import com.ckr.upgrade.UpgradeConfig;
 import com.ckr.upgrade.dialog.UpgradeDialogFragment;
 
@@ -34,8 +35,10 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
             return;
         }
         canShow = false;
+        int cancelableType = activity.getResources().getInteger(R.integer.dialog_cancelable_type);
+        Log.d(TAG, "showDialog: cancelableType:" + cancelableType);
         UpgradeDialogFragment dialogFragment = new UpgradeDialogFragment.Builder()
-//                .setOnDialogClickListener(this)
+                .setCancelableType(cancelableType)
                 .build();
         if (activity instanceof FragmentActivity) {
             dialogFragment.showAllowingStateLoss(((FragmentActivity) activity).getSupportFragmentManager(), UpgradeDialogFragment.class.getSimpleName());
