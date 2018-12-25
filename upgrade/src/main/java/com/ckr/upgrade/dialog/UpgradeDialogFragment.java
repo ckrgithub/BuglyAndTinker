@@ -87,31 +87,24 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements OnDownl
     @Override
     protected void init(Bundle savedInstanceState) {
         DownloadManager.with(this.getContext().getApplicationContext()).registerDownloadListener(this);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        TextView btnNegative = view.findViewById(R.id.btnNegative);
-        btnPositive = view.findViewById(R.id.btnPositive);
-        View verticalLine = view.findViewById(R.id.verticalLine);
-        TextView titleView = view.findViewById(R.id.titleView);
-        TextView msgView = view.findViewById(R.id.msgView);
+        TextView btnNegative = rootView.findViewById(R.id.btnNegative);
+        btnPositive = rootView.findViewById(R.id.btnPositive);
+        View verticalLine = rootView.findViewById(R.id.verticalLine);
+        TextView titleView = rootView.findViewById(R.id.titleView);
+        TextView msgView = rootView.findViewById(R.id.msgView);
         btnPositive.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
-
         UpgradeInfo upgradeInfo = DownloadManager.with(getContext()).getUpgradeInfo();
         if (upgradeInfo == null) {
             return;
         }
         String title = upgradeInfo.title;
         String newFeature = upgradeInfo.newFeature;
-        int upgradeType = upgradeInfo.upgradeType;
         UpgradeLog.Logd(TAG, "onViewCreated: title:" + title + ",newFeature:" + newFeature);
-
         titleView.setText(title);
         msgView.setText(newFeature);
 
+        int upgradeType = upgradeInfo.upgradeType;
         int cancelableType = DEFAULT;
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -123,6 +116,11 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements OnDownl
         } else {
             setCancelableType(cancelableType);
         }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         updateBtn(getText());
     }
 
