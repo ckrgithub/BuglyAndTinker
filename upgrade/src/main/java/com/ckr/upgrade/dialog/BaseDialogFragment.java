@@ -29,6 +29,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements View.
     public static final int IS_CANCELED_ON_KEYCODE_BACK = 2;
     public static final int NO_CANCELED = 3;
     private int mCancelableType = DEFAULT;
+    protected View rootView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,12 +41,12 @@ public abstract class BaseDialogFragment extends DialogFragment implements View.
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().setOnKeyListener(this);
-        View inflate = inflater.inflate(R.layout.dialog_base, container, false);
-        FrameLayout root = (FrameLayout) inflate.findViewById(R.id.dialog_container);
+        rootView = inflater.inflate(R.layout.dialog_base, container, false);
+        FrameLayout root = (FrameLayout) rootView.findViewById(R.id.dialog_container);
         root.setOnClickListener(this);
         View.inflate(getContext(), getLayoutId(), root);
         init(savedInstanceState);
-        return inflate;
+        return rootView;
     }
 
     /**
