@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,11 +48,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         setOnClickListener(R.id.btnDownload);
         setOnClickListener(R.id.btnPause);
         setOnClickListener(R.id.btnClear);
-
-//        versionView.append(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
-//        String tinkerId = TinkerManager.getTinkerId();
-//        Logd(TAG, "onCreate: tinkerId:" + tinkerId);
-//        tinkerIdView.append(tinkerId);
     }
 
     private void setOnClickListener(@IdRes int viewId) {
