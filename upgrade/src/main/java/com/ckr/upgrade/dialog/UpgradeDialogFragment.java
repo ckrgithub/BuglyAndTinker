@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -220,7 +219,7 @@ public class UpgradeDialogFragment extends BaseDialogFragment implements OnDownl
         boolean canInstall = ApkUtil.hasInstallPermission(getContext());
         Context context = getContext();
         if (canInstall) {
-            ApkUtil.installApk(ApkUtil.getApkPath(apkUrl, context), context);
+            ApkUtil.installApk(ApkUtil.getApkPath(apkUrl, context), context, true);
         } else {
             Toast.makeText(context, context.getString(R.string.tips_install_permission), Toast.LENGTH_LONG).show();
             if (isOpenSetting) {
