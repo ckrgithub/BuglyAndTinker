@@ -42,6 +42,6 @@ ext {
             bugly_nativecrashreport: "com.tencent.bugly:nativecrashreport:latest.release",
 
             okhttp                 : "com.squareup.okhttp3:okhttp:${okhttp}",
-            app_upgrade            : "ckrjfrog.Upgrade:AppUpgrade:1.0.4",
+            app_upgrade            : "ckrjfrog.Upgrade:AppUpgrade:${upgradeConfig.publishVersion}",
     ]
 }
