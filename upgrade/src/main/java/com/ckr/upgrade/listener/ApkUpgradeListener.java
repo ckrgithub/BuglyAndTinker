@@ -31,7 +31,7 @@ public class ApkUpgradeListener implements UpgradeListener, Runnable {
 
 	@Override
 	public void onUpgrade(int i, UpgradeInfo upgradeInfo, boolean b, boolean b1) {
-		Logd(TAG, "onUpgrade: i" + i + ",b:" + b + ",b1:" + b1 + ",upgradeInfo:" + upgradeInfo);
+		Logd(TAG, "onUpgrade: i:" + i + ",b:" + b + ",b1:" + b1 + ",upgradeInfo:" + upgradeInfo);
 		if (upgradeInfo != null) {
 			com.ckr.upgrade.UpgradeInfo info = new com.ckr.upgrade.UpgradeInfo();
 			info.title = upgradeInfo.title;

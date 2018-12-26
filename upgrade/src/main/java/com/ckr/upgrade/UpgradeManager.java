@@ -41,6 +41,7 @@ public class UpgradeManager {
      * @param enableHotfix
      */
     public static void init(@NonNull Application application, @NonNull UpgradeConfig config, boolean enableHotfix) {
+        UpgradeLog.debug(UpgradeConfig.isDebug);
         long startTime = System.currentTimeMillis();
         UpgradeLog.Logd(TAG, "init: startTime:" + startTime);
         UpgradeConfig.smallIconId = config.notificationIconId;
