@@ -557,7 +557,7 @@ public class DownloadManager implements Runnable {
                             }
                         }
                         if (UpgradeConfig.isAutoInstall) {
-                            ApkUtil.installApk(obj.toString(), mContext);
+                            ApkUtil.installApk(obj.toString(), mContext, true);
                         }
                     }
                     break;

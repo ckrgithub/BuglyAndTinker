@@ -117,24 +117,23 @@ public class ApkUtil {
      * 安装apk
      *
      * @param path apk路径
+     * @param enableRequestPermission 是否开启权限申请
      */
-    public static boolean installApk(String path, @NonNull Context context) {
+    public static boolean installApk(String path, @NonNull Context context, boolean enableRequestPermission) {
         Logd(TAG, "installApk: path:" + path);
         File apkFile = new File(path);
         if (!apkFile.exists()) {
             return false;
         }
-        boolean canInstall = true;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            canInstall = context.getPackageManager().canRequestPackageInstalls();
-        }
-        if (!canInstall) {
-            if (context instanceof OnInstallApkListener) {
-                ((OnInstallApkListener) context).requestInstallPermission();
-            } else {
-                OnInstallApkListener onInstallerListener = DownloadManager.with(context).getOnInstallerListener();
-                if (onInstallerListener != null) {
-                    onInstallerListener.requestInstallPermission();
+        if (!hasInstallPermission(context)) {
+            if (enableRequestPermission) {
+                if (context instanceof OnInstallApkListener) {
+                    ((OnInstallApkListener) context).requestInstallPermission();
+                } else {
+                    OnInstallApkListener onInstallerListener = DownloadManager.with(context).getOnInstallerListener();
+                    if (onInstallerListener != null) {
+                        onInstallerListener.requestInstallPermission();
+                    }
                 }
             }
             return false;
