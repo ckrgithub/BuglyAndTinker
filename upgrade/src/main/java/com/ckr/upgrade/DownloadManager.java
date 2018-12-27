@@ -246,7 +246,7 @@ public class DownloadManager implements Runnable {
                         mContext.getResources().getInteger(R.integer.time_light_on),
                         mContext.getResources().getInteger(R.integer.time_light_off))
                 .setContentIntent(getPendingIntent(INIT))
-                .setOngoing(true);
+                .setOngoing(false);
 
         Notification notification = mBuilder.build();
         notification.flags |= Notification.FLAG_SHOW_LIGHTS;
