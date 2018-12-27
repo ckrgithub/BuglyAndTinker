@@ -456,6 +456,7 @@ public class DownloadManager implements Runnable {
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
         boolean isComplete = false;
+        int lastProgress = -1;
         try {
             inputStream = response.body().byteStream();
             outputStream = new FileOutputStream(apkFile, isAppend);
@@ -466,10 +467,12 @@ public class DownloadManager implements Runnable {
                 downloadLen += len;
                 int progress = (int) (downloadLen * MAX_PROGRESS / contentLen);
                 Logd(TAG, "writeApk: progress:" + progress);
-                if (progress < MAX_PROGRESS) {
+                if (progress != lastProgress && progress < MAX_PROGRESS) {
+                    Logd(TAG, "writeApk: sendProgressMsg:" + progress);
                     updateProgress(mDownloadStatus, progress);
                     sendProgressMsg((int) contentLen, (int) startLen, progress);
                 }
+                lastProgress = progress;
             }
             outputStream.flush();
             isComplete = true;
