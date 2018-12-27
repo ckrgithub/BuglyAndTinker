@@ -19,6 +19,8 @@ public class OkHttpFactory {
                             .connectTimeout(10, TimeUnit.SECONDS)
                             .readTimeout(15, TimeUnit.SECONDS)
                             .writeTimeout(15, TimeUnit.SECONDS)
+                            .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
+                            .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
                             .retryOnConnectionFailure(true);
                     client = builder.build();
                 }
