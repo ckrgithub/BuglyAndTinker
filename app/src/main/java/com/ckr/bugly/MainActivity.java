@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 if (upgradeInfo != null) {
                     int downloadStatus = with.getDownloadStatus();
                     if (downloadStatus == COMPLETE) {
-                        ApkUtil.installApk(ApkUtil.getApkPath(upgradeInfo.apkUrl, context), context);
+                        ApkUtil.installApk(ApkUtil.getApkPath(upgradeInfo.apkUrl, context), this,false);
                     }
                 }
             }
@@ -123,7 +123,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             }
                         }
                         if (isComplete) {
-                            ApkUtil.installApk(path, this);
+                            ApkUtil.installApk(path, this,true);
                         }
                     }
                 }
