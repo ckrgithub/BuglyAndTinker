@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <application>
+    <application android:networkSecurityConfig="@xml/network_security_config">
         <!-- android 7.0或以上设备访问共享文件的适配 -->
         <provider
             android:name=".provider.ApkFileProvider"
@@ -38,8 +38,8 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".util.ClearApkService"
-            android:exported="false">
-        </service>
+        <service
+            android:name=".util.ClearApkService"
+            android:exported="false"></service>
     </application>
 </manifest>
