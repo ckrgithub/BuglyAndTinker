@@ -21,10 +21,11 @@ public class UpgradeApplication extends Application {
         UpgradeConfig.isAutoInstall = true;
         UpgradeConfig.enableNotification = true;
         UpgradeConfig.enableWriteChannelInfo = true;
+        UpgradeConfig.pauseDownloadWhenClickNotify = true;
         UpgradeConfig.canShowUpgradeActs.add(MainActivity.class);
         UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplicationContext()), R.mipmap.ic_launcher);
         //升级功能配置
-        UpgradeManager.init(this, upgradeConfig,false);
+        UpgradeManager.init(this, upgradeConfig, false);
     }
 
 
