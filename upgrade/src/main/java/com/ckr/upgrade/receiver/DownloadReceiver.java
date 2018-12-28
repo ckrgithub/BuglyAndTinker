@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.ckr.upgrade.DownloadManager;
+import com.ckr.upgrade.UpgradeConfig;
 import com.ckr.upgrade.util.ApkUtil;
 import com.ckr.upgrade.util.UpgradeLog;
 
@@ -21,33 +22,35 @@ import static com.ckr.upgrade.DownloadManager.PAUSED;
  */
 
 public class DownloadReceiver extends BroadcastReceiver {
-	private static final String TAG = "DownloadReceiver";
-	public static final String APK_DOWNLOAD_RECEIVER = "apk_download_receiver";
+    private static final String TAG = "DownloadReceiver";
+    public static final String APK_DOWNLOAD_RECEIVER = "apk_download_receiver";
 
-	public DownloadReceiver() {
-	}
+    public DownloadReceiver() {
+    }
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		UpgradeLog.Logd(TAG, "onReceive: " + this);
-		if (intent != null) {
-			int status = intent.getIntExtra(DOWNLOAD_STATUS, INIT);
-			String url = intent.getStringExtra(APK_URL);
-			UpgradeLog.Logd(TAG, "onReceive: status:" + status + ",url:" + url);
-			switch (status) {
-				case DOWNLOADING:
-					DownloadManager.with(context.getApplicationContext()).pauseDownload();
-					break;
-				case COMPLETE:
-					ApkUtil.installApk(url, context, true);
-					break;
-				case PAUSED:
-					DownloadManager.with(context.getApplicationContext()).resumeDownload();
-					break;
-				case FAILED:
-					DownloadManager.with(context.getApplicationContext()).startDownload();
-					break;
-			}
-		}
-	}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        UpgradeLog.Logd(TAG, "onReceive: " + this);
+        if (intent != null) {
+            int status = intent.getIntExtra(DOWNLOAD_STATUS, INIT);
+            String url = intent.getStringExtra(APK_URL);
+            UpgradeLog.Logd(TAG, "onReceive: status:" + status + ",url:" + url);
+            switch (status) {
+                case DOWNLOADING:
+                    if (UpgradeConfig.pauseDownloadWhenClickNotify) {
+                        DownloadManager.with(context.getApplicationContext()).pauseDownload();
+                    }
+                    break;
+                case COMPLETE:
+                    ApkUtil.installApk(url, context, true);
+                    break;
+                case PAUSED:
+                    DownloadManager.with(context.getApplicationContext()).resumeDownload();
+                    break;
+                case FAILED:
+                    DownloadManager.with(context.getApplicationContext()).startDownload();
+                    break;
+            }
+        }
+    }
 }

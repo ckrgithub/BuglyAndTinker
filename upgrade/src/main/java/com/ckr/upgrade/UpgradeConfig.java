@@ -17,6 +17,7 @@ public class UpgradeConfig {
     public static boolean enableNotification = true;//是否发送通知
     public static boolean enableWriteChannelInfo = true;//是否写入渠道
     public static boolean toastWhenNoUpgrade = false;//是否显示toast当不需要更新时
+    public static boolean pauseDownloadWhenClickNotify = true;//点击通知时是否允许暂停下载
     public static List<Class<? extends Activity>> canShowUpgradeActs = new ArrayList<>(CAPACITY);
 
 
