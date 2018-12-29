@@ -26,6 +26,7 @@ App全量更新和热更新
   dependencies {
     implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
   }
 ```
 * 代码使用
