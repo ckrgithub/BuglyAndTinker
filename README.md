@@ -33,14 +33,16 @@ App全量更新和热更新
 
 步骤一.bugly初始化：UpgradeManager.init()
 ```
+  UpgradeLog.debug(BuildConfig.IS_DEBUG);
   UpgradeConfig.isDebug = BuildConfig.IS_DEBUG;
   UpgradeConfig.isAutoInstall = true;
   UpgradeConfig.enableNotification = true;
   UpgradeConfig.enableWriteChannelInfo = true;
+  UpgradeConfig.pauseDownloadWhenClickNotify = true;
   UpgradeConfig.canShowUpgradeActs.add(MainActivity.class);
-  UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplication().getApplicationContext()), R.mipmap.ic_launcher);
+  UpgradeConfig upgradeConfig = new UpgradeConfig(BUGLY_ID, BuildConfig.VERSION_NAME, ChannelUtil.getChannelInfo(this.getApplicationContext()), R.mipmap.ic_launcher);
   //升级功能配置
-  UpgradeManager.init(getApplication(), upgradeConfig);
+  UpgradeManager.init(this, upgradeConfig, false);
 ```
 步骤二.apk下载
 ```
