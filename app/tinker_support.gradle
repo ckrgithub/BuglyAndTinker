@@ -30,7 +30,7 @@ def getTinkerIdValue() {
 
 tinkerSupport {
     //开启tinker-support插件，默认值true
-    enable = true
+    enable = enableTinkerSupport
     //自定归档目录，默认值当前module的子目录tinker
     autoBackupApkDir = "${bakPath}"
 
