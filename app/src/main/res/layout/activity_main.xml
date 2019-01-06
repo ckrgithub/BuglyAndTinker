@@ -89,5 +89,13 @@
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/btnDownload"
         app:layout_constraintTop_toTopOf="@+id/btnDownload" />
+    <Button
+        android:id="@+id/btnPatch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="检测补丁"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/btnPause"
+        app:layout_constraintTop_toTopOf="@+id/btnPause" />
 
 </android.support.constraint.ConstraintLayout>

@@ -23,7 +23,7 @@ ext {
     tinkerSupport = "1.1.5"
     walle = "1.1.6"
     okhttp = "3.11.0"
-    enableTinkerSupport = false
+    enableTinkerSupport = true
 
     applyConfig = [
             appcompat_v7           : "com.android.support:appcompat-v7:${supportVersion}",
