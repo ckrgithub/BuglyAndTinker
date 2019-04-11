@@ -63,6 +63,8 @@ public class AppTracker implements Application.ActivityLifecycleCallbacks, Upgra
                         if (act.isInstance(activity)) {
                             Log.d(TAG, "onActivityResumed: activity:" + activity);
                             this.activity = activity;
+                            showDialog(canShow);
+                            break;
                         }
                     }
                 }
